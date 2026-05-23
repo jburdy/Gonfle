@@ -258,7 +258,6 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = `choice-card${option.id === selectedId ? " is-active" : ""}`;
-      button.setAttribute("role", "listitem");
       button.setAttribute("aria-pressed", String(option.id === selectedId));
 
       const title = document.createElement("strong");

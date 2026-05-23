@@ -52,6 +52,7 @@ Le répertoire racine du site web (wwwRoot) est situé dans le dossier `/docs` e
 - Vérifier les espaces et conflits simples avec `git diff --check`.
 - Rechercher les termes supprimés quand un concept disparaît, par exemple `altitude`.
 - Pour une modification UI, ouvrir `docs/index.html` dans un navigateur et contrôler desktop + mobile si possible.
+- Pour auditer l'accessibilité et les performances avec Lighthouse : démarrer un serveur local (ex: `npx http-server docs -p 8080`) puis exécuter `npx lighthouse http://localhost:8080/ --chrome-flags="--headless"`.
 - S’il n’existe pas de suite de tests, le dire clairement dans le résumé final.
 
 ## Git

@@ -66,7 +66,7 @@
             </div>
             <button class="guide-link" type="button" id="openSurfaceGuideButton">Guide visuel</button>
           </div>
-          <div class="choice-grid surface-grid" id="surfaceGrid" role="list"></div>
+          <div class="choice-grid surface-grid" id="surfaceGrid"></div>
         </article>
 
         <article class="panel">
@@ -76,7 +76,7 @@
               <h2>Type de sortie</h2>
             </div>
           </div>
-          <div class="choice-grid ride-grid" id="rideGrid" role="list"></div>
+          <div class="choice-grid ride-grid" id="rideGrid"></div>
         </article>
 
         <article class="panel">
@@ -87,10 +87,10 @@
             </div>
           </div>
           <div class="condition-grid">
-            <label>Température gonflage °C
+            <label for="inflationTemp">Température gonflage °C
               <input id="inflationTemp" type="number" inputmode="decimal" min="-20" max="60" step="1">
             </label>
-            <label>Température sortie °C
+            <label for="rideTemp">Température sortie °C
               <input id="rideTemp" type="number" inputmode="decimal" min="-20" max="60" step="1">
             </label>
           </div>
@@ -323,10 +323,10 @@
         <button type="button" class="close-button" data-close-dialog="riderDialog" aria-label="Fermer">×</button>
       </div>
       <input type="hidden" id="riderId">
-      <label>Nom
+      <label for="riderName">Nom
         <input id="riderName" type="text" autocomplete="name" required maxlength="40" placeholder="Ex. Jacqueline">
       </label>
-      <label>Poids cycliste kg
+      <label for="riderWeight">Poids cycliste kg
         <input id="riderWeight" type="number" inputmode="decimal" min="20" max="200" step="0.1" required placeholder="Ex. 77">
       </label>
       <div class="dialog-actions">
@@ -347,23 +347,23 @@
         <button type="button" class="close-button" data-close-dialog="bikeDialog" aria-label="Fermer">×</button>
       </div>
       <input type="hidden" id="bikeId">
-      <label>Nom du vélo
+      <label for="bikeName">Nom du vélo
         <input id="bikeName" type="text" required maxlength="40" placeholder="Ex. Gravel titane">
       </label>
-      <label>Poids vélo + équipement kg
+      <label for="bikeWeight">Poids vélo + équipement kg
         <input id="bikeWeight" type="number" inputmode="decimal" min="3" max="60" step="0.1" required placeholder="Ex. 9">
       </label>
-      <label>Largeur pneu mesurée mm
+      <label for="bikeTireWidth">Largeur pneu mesurée mm
         <input id="bikeTireWidth" type="number" inputmode="numeric" min="20" max="65" step="1" required placeholder="Ex. 45">
       </label>
-      <label>Diamètre de roue
+      <label for="bikeWheelDiameter">Diamètre de roue
         <select id="bikeWheelDiameter" required></select>
       </label>
-      <label>Répartition du poids
+      <label for="bikeWeightDistribution">Répartition du poids
         <select id="bikeWeightDistribution" required aria-describedby="weightDistributionHelp"></select>
       </label>
       <p class="field-help" id="weightDistributionHelp">Ce choix décrit la charge avant/arrière. Par défaut : 48/52 · Route. 50/50 pour tri/CLM/piste, 47/53 pour gravel ou position redressée, 46.5/53.5 pour VTT.</p>
-      <label>Type de pneu
+      <label for="bikeTireType">Type de pneu
         <select id="bikeTireType" required></select>
       </label>
       <p class="field-help">Choisissez “haut rendement” pour un pneu course souple, “standard souple” pour un pneu courant, “renforcé” pour un pneu très protégé.</p>
@@ -388,8 +388,8 @@
         class="guide-image"
         src="assets/surface-conditions.webp"
         alt="Guide visuel des conditions de surface pour choisir le terrain"
-        width="1600"
-        height="900"
+        width="565"
+        height="1141"
         decoding="async"
       >
     </div>
