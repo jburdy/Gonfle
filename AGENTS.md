@@ -18,7 +18,7 @@ Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté 
 - Les valeurs par défaut sont `Route usée` et `Détente`.
 - La correction conditions ne porte que sur la température. Ne pas réintroduire la notion d’altitude.
 - Les pressions affichées sont les pressions à régler au gonflage. Les cibles de roulage peuvent apparaître dans les alertes.
-- Les PSI sont la valeur principale et s’affichent sans décimale. Les bar sont secondaires et arrondis à une décimale.
+- Les bar sont la valeur principale et s’affichent avec une décimale. Les PSI sont secondaires et arrondis sans décimale.
 - Le poids total valide pour le modèle SILCA reste `34` à `205 kg`.
 
 ## Calcul

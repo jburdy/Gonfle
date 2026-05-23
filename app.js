@@ -307,10 +307,10 @@
     refs.pressureResults.classList.remove("is-hidden");
     refs.copyButton.classList.remove("is-hidden");
 
-    refs.frontBar.textContent = `${formatBar(result.frontBar)} bar`;
-    refs.rearBar.textContent = `${formatBar(result.rearBar)} bar`;
-    refs.frontPsi.textContent = formatPsi(result.frontPsi);
-    refs.rearPsi.textContent = formatPsi(result.rearPsi);
+    refs.frontBar.textContent = formatBar(result.frontBar);
+    refs.rearBar.textContent = formatBar(result.rearBar);
+    refs.frontPsi.textContent = `${formatPsi(result.frontPsi)} PSI`;
+    refs.rearPsi.textContent = `${formatPsi(result.rearPsi)} PSI`;
     refs.frontGauge.style.width = `${pressureGaugePercent(result.frontBar)}%`;
     refs.rearGauge.style.width = `${pressureGaugePercent(result.rearBar)}%`;
     renderAlerts(createResultAlerts(result));
@@ -375,7 +375,7 @@
       alerts.push({
         type: "info",
         title: "Correction température.",
-        text: `${formatPsi(Math.abs(roundTo(result.environment.correctionPsi, 1)))} PSI ${direction} pour ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C. Cible roulage : ${formatPsi(result.targetFrontPsi)} PSI avant, ${formatPsi(result.targetRearPsi)} PSI arrière.`,
+        text: `${formatBar(Math.abs(result.environment.correctionPsi * PSI_TO_BAR))} bar ${direction} pour ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C. Cible roulage : ${formatBar(result.targetFrontPsi * PSI_TO_BAR)} bar avant, ${formatBar(result.targetRearPsi * PSI_TO_BAR)} bar arrière.`,
       });
     }
 
@@ -391,13 +391,13 @@
       alerts.push({
         type: "danger",
         title: "Pincement extrême.",
-        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Sinon : ${formatPsi(result.frontAlternativePsi)} PSI avant, ${formatPsi(result.rearAlternativePsi)} PSI arrière.`,
+        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Sinon : ${formatBar(result.frontAlternativePsi * PSI_TO_BAR)} bar avant, ${formatBar(result.rearAlternativePsi * PSI_TO_BAR)} bar arrière.`,
       });
     } else if (result.pinchFlatRisk === "increased") {
       alerts.push({
         type: "warning",
         title: "Pincement possible.",
-        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Secours : ${formatPsi(result.frontAlternativePsi)} PSI avant, ${formatPsi(result.rearAlternativePsi)} PSI arrière.`,
+        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Secours : ${formatBar(result.frontAlternativePsi * PSI_TO_BAR)} bar avant, ${formatBar(result.rearAlternativePsi * PSI_TO_BAR)} bar arrière.`,
       });
     }
 
@@ -653,12 +653,12 @@
       `Cycliste: ${lastResult.rider.name}`,
       `Terrain: ${lastResult.surface.label}`,
       `Sortie: ${lastResult.ride.label}`,
-      `Avant: ${formatPsi(lastResult.frontPsi)} PSI (${formatBar(lastResult.frontBar)} bar)`,
-      `Arrière: ${formatPsi(lastResult.rearPsi)} PSI (${formatBar(lastResult.rearBar)} bar)`,
+      `Avant: ${formatBar(lastResult.frontBar)} bar (${formatPsi(lastResult.frontPsi)} PSI)`,
+      `Arrière: ${formatBar(lastResult.rearBar)} bar (${formatPsi(lastResult.rearPsi)} PSI)`,
     ].join("\n");
 
     const conditionText = lastResult.environment?.hasCorrection
-      ? `\nCorrection température : ${formatSignedPsi(-lastResult.environment.correctionPsi)} PSI au gonflage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C)`
+      ? `\nCorrection température : ${formatSignedBar(-lastResult.environment.correctionPsi * PSI_TO_BAR)} bar au gonflage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C)`
       : "";
 
     if (navigator.clipboard?.writeText) {
@@ -857,9 +857,9 @@
     return `${rounded > 0 ? "+" : ""}${formatOne(rounded)}`;
   }
 
-  function formatSignedPsi(value) {
-    const rounded = roundTo(value, 1);
-    return `${rounded > 0 ? "+" : ""}${formatPsi(rounded)}`;
+  function formatSignedBar(value) {
+    const rounded = roundTo(value, 0.1);
+    return `${rounded > 0 ? "+" : ""}${formatBar(Math.abs(rounded))}`;
   }
 
   function showDialog(dialog) {

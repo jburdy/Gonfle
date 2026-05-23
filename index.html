@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080d14">
   <title>Calculateur de pression pneus vélo</title>
-  <meta name="description" content="Calculateur de pression pneus vélo avec profils locaux, PSI et bar.">
+  <meta name="description" content="Calculateur de pression pneus vélo avec profils locaux, bar et PSI.">
   <link rel="stylesheet" href="styles.css">
   <script defer src="app.js"></script>
 </head>
@@ -14,12 +14,12 @@
     <header class="hero">
       <div>
         <p class="eyebrow">Pression pneus vélo</p>
-        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Les pressions avant/arrière sont calculées en PSI et bar.</p>
+        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Les pressions avant/arrière sont calculées en bar et PSI.</p>
       </div>
       <div class="hero-meter" aria-hidden="true">
         <span class="meter-ring"></span>
         <span class="meter-needle"></span>
-        <span class="meter-label">PSI</span>
+        <span class="meter-label">bar</span>
       </div>
     </header>
 
@@ -115,20 +115,20 @@
             <div class="pressure-tile front-tile">
               <div class="tile-topline">
                 <span>Avant</span>
-                <span id="frontBar" class="secondary-pressure">-- bar</span>
+                <span id="frontPsi" class="secondary-pressure">-- PSI</span>
               </div>
-              <strong id="frontPsi">--</strong>
-              <span class="unit">PSI</span>
+              <strong id="frontBar">--</strong>
+              <span class="unit">bar</span>
               <div class="gauge-track"><span id="frontGauge" class="gauge-fill"></span></div>
             </div>
 
             <div class="pressure-tile rear-tile">
               <div class="tile-topline">
                 <span>Arrière</span>
-                <span id="rearBar" class="secondary-pressure">-- bar</span>
+                <span id="rearPsi" class="secondary-pressure">-- PSI</span>
               </div>
-              <strong id="rearPsi">--</strong>
-              <span class="unit">PSI</span>
+              <strong id="rearBar">--</strong>
+              <span class="unit">bar</span>
               <div class="gauge-track"><span id="rearGauge" class="gauge-fill"></span></div>
             </div>
           </div>

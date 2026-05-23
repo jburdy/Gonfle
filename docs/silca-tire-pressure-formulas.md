@@ -1,6 +1,6 @@
 # TL;DR
 
-Le calculateur SILCA calcule la pression cote client en JavaScript. La pression finale est un `CPP` en PSI, multiplie par un coefficient de vitesse, un coefficient de repartition avant/arriere et un coefficient de type de pneu.
+Le calculateur SILCA calcule la pression cote client en JavaScript. La pression finale est un `CPP` en PSI, multiplie par un coefficient de vitesse, un coefficient de repartition avant/arriere et un coefficient de type de pneu. L'interface affiche les bar en valeur principale.
 
 Source analysee: `https://silca.cc/pages/pro-tire-pressure-calculator`, bloc JavaScript public de la page, recupere le 2026-05-23.
 
@@ -143,19 +143,19 @@ P_arriere_affiche_psi = P_arriere_psi - correction_conditions_psi
 
 `P_avant_psi` et `P_arriere_psi` restent les cibles en conditions de roulage; les valeurs affichees sont les pressions a regler au gonflage.
 
-Affichage PSI:
-
-```text
-PSI_affiche = round(P_psi)
-```
-
 Affichage BAR:
 
 ```text
 BAR_affiche = round((P_psi * 0.0689476) * 10) / 10
 ```
 
-L'interface met les PSI en valeur principale sans decimale. Les bar sont affiches en secondaire avec une decimale.
+Affichage PSI:
+
+```text
+PSI_affiche = round(P_psi)
+```
+
+L'interface met les bar en valeur principale avec une decimale. Les PSI sont affiches en secondaire sans decimale.
 
 ## Alerte Hookless
 
