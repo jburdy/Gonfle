@@ -1,4 +1,4 @@
-const CACHE_NAME = "gonfle-cache-v1";
+const CACHE_NAME = "gonfle-cache-v2";
 
 const ASSETS = [
   "./",

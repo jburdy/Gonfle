@@ -127,9 +127,19 @@ Sources consultees pour TPU:
 
 ## Pressions Finales
 
+Si les pneus avant et arrière sont identiques (par défaut) :
 ```text
 P_avant_psi = CPP * C_vitesse * C_repartition_avant * C_type_pneu_avant
 P_arriere_psi = CPP * C_vitesse * C_repartition_arriere * C_type_pneu_arriere
+```
+
+Si les pneus avant et arrière sont différents, la largeur et le type de pneu sont spécifiés pour chaque pneu. Le coefficient de pression de base `CPP` (qui dépend de la largeur `w`) et le coefficient de type de pneu `C_type_pneu` sont alors calculés pour chaque pneu :
+```text
+CPP_avant = calculateCpp({ width: frontWidth, diameter, k })
+CPP_arriere = calculateCpp({ width: rearWidth, diameter, k })
+
+P_avant_psi = CPP_avant * C_vitesse * C_repartition_avant * C_type_pneu_avant
+P_arriere_psi = CPP_arriere * C_vitesse * C_repartition_arriere * C_type_pneu_arriere
 ```
 
 Pour les options TPU, `C_type_pneu` inclut deja l'ajustement de -10% issu du rapport TPU.

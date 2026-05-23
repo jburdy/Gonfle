@@ -115,11 +115,18 @@
       bikeId: document.getElementById("bikeId"),
       bikeName: document.getElementById("bikeName"),
       bikeWeight: document.getElementById("bikeWeight"),
-      bikeTireWidth: document.getElementById("bikeTireWidth"),
       bikeWheelDiameter: document.getElementById("bikeWheelDiameter"),
       bikeWeightDistribution: document.getElementById("bikeWeightDistribution"),
-      bikeTireType: document.getElementById("bikeTireType"),
       deleteBikeButton: document.getElementById("deleteBikeButton"),
+      bikeSameTires: document.getElementById("bikeSameTires"),
+      sameTiresFields: document.getElementById("sameTiresFields"),
+      diffTiresFields: document.getElementById("diffTiresFields"),
+      bikeTireWidth: document.getElementById("bikeTireWidth"),
+      bikeTireType: document.getElementById("bikeTireType"),
+      bikeFrontTireWidth: document.getElementById("bikeFrontTireWidth"),
+      bikeFrontTireType: document.getElementById("bikeFrontTireType"),
+      bikeRearTireWidth: document.getElementById("bikeRearTireWidth"),
+      bikeRearTireType: document.getElementById("bikeRearTireType"),
     };
 
     populateBikeDialogSelects();
@@ -159,6 +166,7 @@
       showDialog(refs.surfaceGuideDialog);
     });
 
+    refs.bikeSameTires.addEventListener("change", updateBikeDialogTiresToggle);
     refs.copyButton.addEventListener("click", copyPressures);
     refs.riderForm.addEventListener("submit", saveRiderFromDialog);
     refs.bikeForm.addEventListener("submit", saveBikeFromDialog);
@@ -246,7 +254,10 @@
     }
 
     state.bikes.forEach((bike) => {
-      refs.bikeSelect.append(createOption(bike.id, `${bike.name} · ${bike.tireWidthMm} mm · ${formatOne(bike.bikeAndGearWeightKg)} kg`));
+      const widthLabel = bike.sameTires !== false
+        ? `${bike.tireWidthMm} mm`
+        : `${bike.frontTireWidthMm}/${bike.rearTireWidthMm} mm`;
+      refs.bikeSelect.append(createOption(bike.id, `${bike.name} · ${widthLabel} · ${formatOne(bike.bikeAndGearWeightKg)} kg`));
     });
     refs.bikeSelect.value = state.selectedBikeId;
     refs.bikeSelect.disabled = false;
@@ -324,8 +335,14 @@
 
     if (rider && bike) {
       chips.push(`Total: ${formatOne(rider.weightKg + bike.bikeAndGearWeightKg)} kg`);
-      chips.push(`${bike.tireWidthMm} mm`);
-      chips.push(getTireTypeLabel(bike.tireType));
+      if (bike.sameTires !== false) {
+        chips.push(`${bike.tireWidthMm} mm`);
+        chips.push(getTireTypeLabel(bike.tireType));
+      } else {
+        chips.push(`Av: ${bike.frontTireWidthMm} mm · Ar: ${bike.rearTireWidthMm} mm`);
+        chips.push(`Pneu Av: ${getTireTypeLabel(bike.frontTireType)}`);
+        chips.push(`Pneu Ar: ${getTireTypeLabel(bike.rearTireType)}`);
+      }
     }
 
     chips.push(surface.label);
@@ -379,7 +396,7 @@
       });
     }
 
-    if (result.tireType?.isTpu) {
+    if (result.frontTireType?.isTpu || result.rearTireType?.isTpu) {
       alerts.push({
         type: "info",
         title: "Ajustement TPU.",
@@ -391,13 +408,13 @@
       alerts.push({
         type: "danger",
         title: "Pincement extrême.",
-        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Sinon : ${formatBar(result.frontAlternativePsi * PSI_TO_BAR)} bar avant, ${formatBar(result.rearAlternativePsi * PSI_TO_BAR)} bar arrière.`,
+        text: `Largeur conseillée : ${result.recommendedWidthText}. Sinon : ${formatBar(result.frontAlternativePsi * PSI_TO_BAR)} bar avant, ${formatBar(result.rearAlternativePsi * PSI_TO_BAR)} bar arrière.`,
       });
     } else if (result.pinchFlatRisk === "increased") {
       alerts.push({
         type: "warning",
         title: "Pincement possible.",
-        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Secours : ${formatBar(result.frontAlternativePsi * PSI_TO_BAR)} bar avant, ${formatBar(result.rearAlternativePsi * PSI_TO_BAR)} bar arrière.`,
+        text: `Largeur conseillée : ${result.recommendedWidthText}. Secours : ${formatBar(result.frontAlternativePsi * PSI_TO_BAR)} bar avant, ${formatBar(result.rearAlternativePsi * PSI_TO_BAR)} bar arrière.`,
       });
     }
 
@@ -418,29 +435,69 @@
       return { error: "Poids total requis : 34 à 205 kg pour le modèle SILCA." };
     }
 
-    const width = bike.tireWidthMm;
+    const sameTires = bike.sameTires !== false;
+    const frontWidth = sameTires ? bike.tireWidthMm : bike.frontTireWidthMm;
+    const rearWidth = sameTires ? bike.tireWidthMm : bike.rearTireWidthMm;
+
     const diameter = bike.wheelDiameterMm;
     const k = 0.5 * (massKg - 50) + surface.k1;
-    const cpp = calculateCpp({ width, diameter, k });
+
+    const frontCpp = calculateCpp({ width: frontWidth, diameter, k });
+    const rearCpp = calculateCpp({ width: rearWidth, diameter, k });
+
     const speedCoefficient = 0.97 + ((ride.speedMph - 10) * 0.06 / 23);
     const distribution = findById(WEIGHT_DISTRIBUTIONS, bike.weightDistribution) || WEIGHT_DISTRIBUTIONS[1];
-    const tireType = findById(TIRE_TYPES, bike.tireType) || TIRE_TYPES[0];
+
+    const frontTireType = findById(TIRE_TYPES, sameTires ? bike.tireType : bike.frontTireType) || TIRE_TYPES[0];
+    const rearTireType = findById(TIRE_TYPES, sameTires ? bike.tireType : bike.rearTireType) || TIRE_TYPES[0];
+
     const environment = getEnvironmentCorrection();
 
-    const targetRawFrontPsi = cpp * speedCoefficient * distribution.front * tireType.front;
-    const targetRawRearPsi = cpp * speedCoefficient * distribution.rear * tireType.rear;
+    const targetRawFrontPsi = frontCpp * speedCoefficient * distribution.front * frontTireType.front;
+    const targetRawRearPsi = rearCpp * speedCoefficient * distribution.rear * rearTireType.rear;
+
     const rawFrontPsi = Math.max(0, targetRawFrontPsi - environment.correctionPsi);
     const rawRearPsi = Math.max(0, targetRawRearPsi - environment.correctionPsi);
+
     const frontPsi = roundTo(rawFrontPsi, 1);
     const rearPsi = roundTo(rawRearPsi, 1);
     const frontBar = roundTo(rawFrontPsi * PSI_TO_BAR, 0.1);
     const rearBar = roundTo(rawRearPsi * PSI_TO_BAR, 0.1);
+
     const targetFrontPsi = roundTo(targetRawFrontPsi, 1);
     const targetRearPsi = roundTo(targetRawRearPsi, 1);
-    const pinchFlat = calculatePinchFlat({ massKg, speedMph: ride.speedMph, width, k, rawFrontPsi: targetRawFrontPsi, rawRearPsi: targetRawRearPsi });
-    if (pinchFlat.frontAlternativePsiRaw !== undefined) {
-      pinchFlat.frontAlternativePsi = roundTo(Math.max(0, pinchFlat.frontAlternativePsiRaw - environment.correctionPsi), 1);
-      pinchFlat.rearAlternativePsi = roundTo(Math.max(0, pinchFlat.rearAlternativePsiRaw - environment.correctionPsi), 1);
+
+    // Pinch flat calculations for front and rear
+    const frontPinch = calculatePinchFlatSingle({ massKg, speedMph: ride.speedMph, width: frontWidth, k, rawPsi: targetRawFrontPsi });
+    const rearPinch = calculatePinchFlatSingle({ massKg, speedMph: ride.speedMph, width: rearWidth, k, rawPsi: targetRawRearPsi });
+
+    let pinchFlatRisk = "none";
+    if (frontPinch.pinchFlatRisk === "extreme" || rearPinch.pinchFlatRisk === "extreme") {
+      pinchFlatRisk = "extreme";
+    } else if (frontPinch.pinchFlatRisk === "increased" || rearPinch.pinchFlatRisk === "increased") {
+      pinchFlatRisk = "increased";
+    }
+
+    let recommendedWidthText = "";
+    if (frontPinch.recommendedWidthMm && rearPinch.recommendedWidthMm) {
+      if (frontPinch.recommendedWidthMm === rearPinch.recommendedWidthMm) {
+        recommendedWidthText = `${frontPinch.recommendedWidthMm} mm`;
+      } else {
+        recommendedWidthText = `${frontPinch.recommendedWidthMm} mm (avant) / ${rearPinch.recommendedWidthMm} mm (arrière)`;
+      }
+    } else if (frontPinch.recommendedWidthMm) {
+      recommendedWidthText = `${frontPinch.recommendedWidthMm} mm (avant)`;
+    } else if (rearPinch.recommendedWidthMm) {
+      recommendedWidthText = `${rearPinch.recommendedWidthMm} mm (arrière)`;
+    }
+
+    let frontAlternativePsi = frontPsi;
+    if (frontPinch.alternativePsiRaw !== undefined) {
+      frontAlternativePsi = roundTo(Math.max(0, frontPinch.alternativePsiRaw - environment.correctionPsi), 1);
+    }
+    let rearAlternativePsi = rearPsi;
+    if (rearPinch.alternativePsiRaw !== undefined) {
+      rearAlternativePsi = roundTo(Math.max(0, rearPinch.alternativePsiRaw - environment.correctionPsi), 1);
     }
 
     return {
@@ -450,8 +507,10 @@
       ride,
       massKg,
       k,
-      cpp,
-      tireType,
+      frontCpp,
+      rearCpp,
+      frontTireType,
+      rearTireType,
       environment,
       frontPsi,
       rearPsi,
@@ -464,7 +523,10 @@
       targetRawFrontPsi,
       targetRawRearPsi,
       hooklessWarning: Math.max(frontPsi, rearPsi, targetFrontPsi, targetRearPsi) > 70,
-      ...pinchFlat,
+      pinchFlatRisk,
+      recommendedWidthText,
+      frontAlternativePsi,
+      rearAlternativePsi,
     };
   }
 
@@ -489,7 +551,7 @@
     return num / denom;
   }
 
-  function calculatePinchFlat({ massKg, speedMph, width, k, rawFrontPsi, rawRearPsi }) {
+  function calculatePinchFlatSingle({ massKg, speedMph, width, k, rawPsi }) {
     const speedMs = speedMph * 0.44704;
     const kineticEnergy = 0.5 * massKg * speedMs ** 2;
     const rimEnergy = 0.5 * (0.8 * width) * Math.sqrt(Math.max(0, k ** 2 - (0.8 * width) ** 2));
@@ -518,8 +580,7 @@
       pinchFlatRisk,
       pinchFlatFactor,
       recommendedWidthMm: Math.ceil(recommendedWidth),
-      frontAlternativePsiRaw: alternativeRatio * rawFrontPsi,
-      rearAlternativePsiRaw: alternativeRatio * rawRearPsi,
+      alternativePsiRaw: alternativeRatio * rawPsi,
     };
   }
 
@@ -539,14 +600,54 @@
     refs.bikeId.value = bike?.id || "";
     refs.bikeName.value = bike?.name || "";
     refs.bikeWeight.value = bike?.bikeAndGearWeightKg ?? "";
-    refs.bikeTireWidth.value = bike?.tireWidthMm ?? "";
     refs.bikeWheelDiameter.value = String(bike?.wheelDiameterMm || 622);
     refs.bikeWeightDistribution.value = bike?.weightDistribution || "road";
+
+    const sameTires = bike ? (bike.sameTires !== false) : true;
+    refs.bikeSameTires.checked = sameTires;
+
+    refs.bikeTireWidth.value = bike?.tireWidthMm ?? "";
     refs.bikeTireType.value = bike?.tireType || "high-perf-tubeless-latex";
+
+    refs.bikeFrontTireWidth.value = bike?.frontTireWidthMm ?? bike?.tireWidthMm ?? "";
+    refs.bikeFrontTireType.value = bike?.frontTireType || bike?.tireType || "high-perf-tubeless-latex";
+    refs.bikeRearTireWidth.value = bike?.rearTireWidthMm ?? bike?.tireWidthMm ?? "";
+    refs.bikeRearTireType.value = bike?.rearTireType || bike?.tireType || "high-perf-tubeless-latex";
+
+    updateBikeDialogTiresToggle();
+
     refs.bikeDialogTitle.textContent = bike ? "Modifier le vélo" : "Ajouter un vélo";
     refs.deleteBikeButton.classList.toggle("is-hidden", !bike);
     showDialog(refs.bikeDialog);
     refs.bikeName.focus();
+  }
+
+  function updateBikeDialogTiresToggle() {
+    const same = refs.bikeSameTires.checked;
+
+    if (same) {
+      refs.sameTiresFields.classList.remove("is-hidden");
+      refs.diffTiresFields.classList.add("is-hidden");
+
+      refs.bikeTireWidth.required = true;
+      refs.bikeTireType.required = true;
+
+      refs.bikeFrontTireWidth.required = false;
+      refs.bikeFrontTireType.required = false;
+      refs.bikeRearTireWidth.required = false;
+      refs.bikeRearTireType.required = false;
+    } else {
+      refs.sameTiresFields.classList.add("is-hidden");
+      refs.diffTiresFields.classList.remove("is-hidden");
+
+      refs.bikeTireWidth.required = false;
+      refs.bikeTireType.required = false;
+
+      refs.bikeFrontTireWidth.required = true;
+      refs.bikeFrontTireType.required = true;
+      refs.bikeRearTireWidth.required = true;
+      refs.bikeRearTireType.required = true;
+    }
   }
 
   function saveRiderFromDialog(event) {
@@ -581,15 +682,33 @@
     }
 
     const id = refs.bikeId.value || createId("bike");
+    const sameTires = refs.bikeSameTires.checked;
+
     const bike = {
       id,
       name: refs.bikeName.value.trim(),
       bikeAndGearWeightKg: parseNumericInput(refs.bikeWeight.value),
-      tireWidthMm: parseNumericInput(refs.bikeTireWidth.value),
       wheelDiameterMm: Number(refs.bikeWheelDiameter.value),
       weightDistribution: refs.bikeWeightDistribution.value,
-      tireType: refs.bikeTireType.value,
+      sameTires,
     };
+
+    if (sameTires) {
+      bike.tireWidthMm = parseNumericInput(refs.bikeTireWidth.value);
+      bike.tireType = refs.bikeTireType.value;
+      bike.frontTireWidthMm = bike.tireWidthMm;
+      bike.frontTireType = bike.tireType;
+      bike.rearTireWidthMm = bike.tireWidthMm;
+      bike.rearTireType = bike.tireType;
+    } else {
+      bike.frontTireWidthMm = parseNumericInput(refs.bikeFrontTireWidth.value);
+      bike.frontTireType = refs.bikeFrontTireType.value;
+      bike.rearTireWidthMm = parseNumericInput(refs.bikeRearTireWidth.value);
+      bike.rearTireType = refs.bikeRearTireType.value;
+      bike.tireWidthMm = bike.frontTireWidthMm; // fallback
+      bike.tireType = bike.frontTireType; // fallback
+    }
+
     const index = state.bikes.findIndex((item) => item.id === id);
 
     if (index >= 0) {
@@ -635,6 +754,8 @@
     populateSelect(refs.bikeWheelDiameter, WHEEL_DIAMETERS.map((wheel) => ({ id: wheel.id, label: wheel.label })));
     populateSelect(refs.bikeWeightDistribution, WEIGHT_DISTRIBUTIONS.map((distribution) => ({ id: distribution.id, label: distribution.label })));
     populateSelect(refs.bikeTireType, TIRE_TYPES.map((type) => ({ id: type.id, label: type.label })));
+    populateSelect(refs.bikeFrontTireType, TIRE_TYPES.map((type) => ({ id: type.id, label: type.label })));
+    populateSelect(refs.bikeRearTireType, TIRE_TYPES.map((type) => ({ id: type.id, label: type.label })));
   }
 
   function populateSelect(select, options) {
@@ -753,20 +874,53 @@
 
   function sanitizeBike(bike) {
     const bikeAndGearWeightKg = Number(bike?.bikeAndGearWeightKg);
-    const tireWidthMm = Number(bike?.tireWidthMm);
     const wheelDiameterMm = Number(bike?.wheelDiameterMm);
-    if (!bike?.id || !bike?.name || !Number.isFinite(bikeAndGearWeightKg) || !Number.isFinite(tireWidthMm) || !Number.isFinite(wheelDiameterMm)) {
+    if (!bike?.id || !bike?.name || !Number.isFinite(bikeAndGearWeightKg) || !Number.isFinite(wheelDiameterMm)) {
       return null;
+    }
+
+    const sameTires = bike.sameTires !== false; // defaults to true
+
+    let tireWidthMm, tireType;
+    let frontTireWidthMm, frontTireType;
+    let rearTireWidthMm, rearTireType;
+
+    if (sameTires) {
+      tireWidthMm = Number(bike.tireWidthMm);
+      if (!Number.isFinite(tireWidthMm)) return null;
+      tireType = findById(TIRE_TYPES, bike.tireType) ? bike.tireType : "high-perf-tubeless-latex";
+
+      // populate front/rear equivalents for easier calculations
+      frontTireWidthMm = tireWidthMm;
+      frontTireType = tireType;
+      rearTireWidthMm = tireWidthMm;
+      rearTireType = tireType;
+    } else {
+      frontTireWidthMm = Number(bike.frontTireWidthMm);
+      rearTireWidthMm = Number(bike.rearTireWidthMm);
+      if (!Number.isFinite(frontTireWidthMm) || !Number.isFinite(rearTireWidthMm)) return null;
+
+      frontTireType = findById(TIRE_TYPES, bike.frontTireType) ? bike.frontTireType : "high-perf-tubeless-latex";
+      rearTireType = findById(TIRE_TYPES, bike.rearTireType) ? bike.rearTireType : "high-perf-tubeless-latex";
+
+      // also populate the shared single fields just in case
+      tireWidthMm = frontTireWidthMm;
+      tireType = frontTireType;
     }
 
     return {
       id: String(bike.id),
       name: String(bike.name).slice(0, 40),
       bikeAndGearWeightKg,
-      tireWidthMm,
       wheelDiameterMm,
       weightDistribution: findById(WEIGHT_DISTRIBUTIONS, bike.weightDistribution) ? bike.weightDistribution : "road",
-      tireType: findById(TIRE_TYPES, bike.tireType) ? bike.tireType : "high-perf-tubeless-latex",
+      sameTires,
+      tireWidthMm,
+      tireType,
+      frontTireWidthMm,
+      frontTireType,
+      rearTireWidthMm,
+      rearTireType,
     };
   }
 

@@ -748,6 +748,46 @@ details a {
   margin-left: auto;
 }
 
+/* Styles pour les options de pneus (identiques vs différents) */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 750;
+  user-select: none;
+  padding: 4px 0;
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  min-height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.dialog-fields-group {
+  display: grid;
+  gap: 16px;
+}
+
+.tire-subgroup {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.tire-subgroup h3 {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--accent-2);
+  font-weight: 750;
+}
+
 .is-hidden {
   display: none !important;
 }
