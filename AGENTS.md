@@ -7,8 +7,8 @@ Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté 
 - `index.html` : interface, textes visibles, panneaux d’explication et dialogues profils.
 - `app.js` : état local, calculs, rendu dynamique, alertes et copie des pressions.
 - `styles.css` : design responsive sombre, composants et mise en page.
-- `docs/silca-tire-pressure-formulas.md` : référence technique du modèle de calcul.
-- `docs/Rapport-impacte-TPU.md` : justification locale des choix liés aux chambres TPU.
+- `sources/silca-tire-pressure-formulas.md` : référence technique du modèle de calcul.
+- `sources/Rapport-impacte-TPU.md` : justification locale des choix liés aux chambres TPU.
 - `assets/surface-conditions.webp` : guide visuel des surfaces.
 
 ## Invariants
@@ -23,9 +23,9 @@ Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté 
 
 ## Calcul
 
-- Modifier les formules dans `app.js` et mettre à jour `docs/silca-tire-pressure-formulas.md` dans le même changement.
+- Modifier les formules dans `app.js` et mettre à jour `sources/silca-tire-pressure-formulas.md` dans le même changement.
 - Conserver les coefficients SILCA documentés sauf demande explicite.
-- Toute hypothèse ajoutée, notamment TPU, doit être courte, visible dans la doc et cohérente avec `docs/Rapport-impacte-TPU.md`.
+- Toute hypothèse ajoutée, notamment TPU, doit être courte, visible dans la doc et cohérente avec `sources/Rapport-impacte-TPU.md`.
 - Ne pas masquer les alertes de sécurité : hookless, pincement, TPU et limites pneus/jantes.
 
 ## Interface Et Textes

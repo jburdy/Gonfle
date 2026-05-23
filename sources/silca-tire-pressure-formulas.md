@@ -113,7 +113,7 @@ La carcasse du pneu, souvent appelee `casing` en anglais, est la structure texti
 | Standard butyl | Chambre classique | 0.94 | 0.94 |
 | Renforce anti-crevaison | Carcasse rigide ou protegee | 0.91 | 0.91 |
 
-Note: les coefficients TPU ne sont pas presents dans les quatre choix SILCA originaux. Ils integrent le rapport local `docs/Rapport-impacte-TPU.md`: le TPU ne change pas la logique de base poids x section x terrain, mais il permet souvent de rouler 5 a 10% plus bas qu'un montage butyl de reference pour retrouver un ressenti equivalent, avec plus de confort et de grip. Le calculateur applique donc un ajustement assume de -10% aux options TPU.
+Note: les coefficients TPU ne sont pas presents dans les quatre choix SILCA originaux. Ils integrent le rapport local `sources/Rapport-impacte-TPU.md`: le TPU ne change pas la logique de base poids x section x terrain, mais il permet souvent de rouler 5 a 10% plus bas qu'un montage butyl de reference pour retrouver un ressenti equivalent, avec plus de confort et de grip. Le calculateur applique donc un ajustement assume de -10% aux options TPU.
 
 Les recherches consultees indiquent aussi que le TPU est meilleur que le butyl en rendement, mais varie beaucoup selon le modele: Bicycle Rolling Resistance trouve les Tubolito standard proches du butyl leger et les S-Tubo proches du latex; Rene Herse/Bicycle Quarterly trouve ses TPU prototypes indistinguables de latex ultra-fin en test route; AeroCoach, rapporte par road.cc, trouve Tubolito meilleur que butyl mais moins rapide que latex. Le calculateur distingue donc TPU leger/performance (`0.90`) et TPU standard (`0.873`).
 
