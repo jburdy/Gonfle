@@ -9,7 +9,6 @@
   const STORAGE_KEY = "jtirepresscalc:v1";
   const PSI_TO_BAR = 0.0689476;
   const TEMP_PSI_PER_10C = 3;
-  const ALTITUDE_PSI_PER_1000M = 1.5;
 
   const SURFACES = [
     { id: "new-pavement", label: "Route neuve", detail: "Asphalte lisse · K1 261", k1: 261 },
@@ -39,19 +38,19 @@
   ];
 
   const WEIGHT_DISTRIBUTIONS = [
-    { id: "tr-tt-track", label: "50/50 · Triathlon / TT / piste", front: 1, rear: 1 },
+    { id: "tr-tt-track", label: "50/50 · Tri/CLM/piste", front: 1, rear: 1 },
     { id: "road", label: "48/52 · Route", front: 0.985, rear: 1.01 },
     { id: "gravel", label: "47/53 · Gravel", front: 0.975, rear: 1.02 },
     { id: "mountain", label: "46.5/53.5 · VTT", front: 0.97, rear: 1.03 },
   ];
 
   const TIRE_TYPES = [
-    { id: "high-perf-tubeless-latex", label: "Pneu haut rendement · tubeless ou chambre latex", front: 1, rear: 1 },
-    { id: "high-perf-tpu", label: "Pneu haut rendement · chambre TPU légère", front: 0.9, rear: 0.9, isTpu: true },
-    { id: "mid-range-tubeless-latex", label: "Pneu standard souple · tubeless ou chambre latex", front: 0.97, rear: 0.97 },
-    { id: "mid-range-tpu", label: "Pneu standard souple · chambre TPU", front: 0.873, rear: 0.873, isTpu: true },
-    { id: "mid-range-butyl", label: "Pneu standard · chambre butyl", front: 0.94, rear: 0.94 },
-    { id: "puncture-resistant-tubeless-latex", label: "Pneu renforcé anti-crevaison", front: 0.91, rear: 0.91 },
+    { id: "high-perf-tubeless-latex", label: "Haut rendement · tubeless/latex", front: 1, rear: 1 },
+    { id: "high-perf-tpu", label: "Haut rendement · TPU léger", front: 0.9, rear: 0.9, isTpu: true },
+    { id: "mid-range-tubeless-latex", label: "Standard souple · tubeless/latex", front: 0.97, rear: 0.97 },
+    { id: "mid-range-tpu", label: "Standard souple · TPU", front: 0.873, rear: 0.873, isTpu: true },
+    { id: "mid-range-butyl", label: "Standard · butyl", front: 0.94, rear: 0.94 },
+    { id: "puncture-resistant-tubeless-latex", label: "Renforcé anti-crevaison", front: 0.91, rear: 0.91 },
   ];
 
   const DEFAULT_STATE = {
@@ -59,11 +58,10 @@
     bikes: [],
     selectedRiderId: "",
     selectedBikeId: "",
-    selectedSurface: "new-pavement",
-    selectedRide: "moderate-group",
+    selectedSurface: "worn-pavement",
+    selectedRide: "recreational",
     inflationTempC: 20,
     rideTempC: 20,
-    altitudeDeltaM: 0,
   };
 
   const numberFormats = {
@@ -93,7 +91,6 @@
       rideGrid: document.getElementById("rideGrid"),
       inflationTemp: document.getElementById("inflationTemp"),
       rideTemp: document.getElementById("rideTemp"),
-      altitudeDelta: document.getElementById("altitudeDelta"),
       selectionSummary: document.getElementById("selectionSummary"),
       emptyState: document.getElementById("emptyState"),
       pressureResults: document.getElementById("pressureResults"),
@@ -151,13 +148,11 @@
       state.selectedRide = DEFAULT_STATE.selectedRide;
       state.inflationTempC = DEFAULT_STATE.inflationTempC;
       state.rideTempC = DEFAULT_STATE.rideTempC;
-      state.altitudeDeltaM = DEFAULT_STATE.altitudeDeltaM;
       persistAndRender();
     });
 
     bindEnvironmentInput(refs.inflationTemp, "inflationTempC");
     bindEnvironmentInput(refs.rideTemp, "rideTempC");
-    bindEnvironmentInput(refs.altitudeDelta, "altitudeDeltaM");
 
     refs.openSurfaceGuideButton.addEventListener("click", () => {
       showDialog(refs.surfaceGuideDialog);
@@ -210,7 +205,6 @@
   function renderEnvironmentControls() {
     refs.inflationTemp.value = state.inflationTempC;
     refs.rideTemp.value = state.rideTempC;
-    refs.altitudeDelta.value = state.altitudeDeltaM;
   }
 
   function bindEnvironmentInput(input, stateKey) {
@@ -226,7 +220,7 @@
     refs.riderSelect.replaceChildren();
 
     if (state.riders.length === 0) {
-      refs.riderSelect.append(createOption("", "Aucun cycliste enregistré"));
+      refs.riderSelect.append(createOption("", "Aucun cycliste"));
       refs.riderSelect.disabled = true;
       refs.editRiderButton.disabled = true;
       return;
@@ -244,7 +238,7 @@
     refs.bikeSelect.replaceChildren();
 
     if (state.bikes.length === 0) {
-      refs.bikeSelect.append(createOption("", "Aucun vélo enregistré"));
+      refs.bikeSelect.append(createOption("", "Aucun vélo"));
       refs.bikeSelect.disabled = true;
       refs.editBikeButton.disabled = true;
       return;
@@ -338,7 +332,6 @@
     chips.push(ride.label);
     if (environment.hasCorrection) {
       chips.push(`ΔT ${formatSigned(environment.temperatureDeltaC)} °C`);
-      chips.push(`ΔAlt ${formatSigned(environment.altitudeDeltaM)} m`);
     }
 
     refs.selectionSummary.replaceChildren(...chips.map((text) => {
@@ -372,8 +365,8 @@
     if (result.hooklessWarning) {
       alerts.push({
         type: "warning",
-        title: "Alerte hookless.",
-        text: "Si vous utilisez des jantes hookless ou tubeless straight side, vérifiez impérativement la limite fabricant. SILCA signale une attention au-delà de 70 PSI.",
+        title: "Hookless.",
+        text: "Vérifiez la limite fabricant. SILCA appelle à la prudence au-delà de 70 PSI.",
       });
     }
 
@@ -381,31 +374,30 @@
       const direction = result.environment.correctionPsi > 0 ? "retirée" : "ajoutée";
       alerts.push({
         type: "info",
-        title: "Correction conditions appliquée.",
-        text: `${formatPsi(Math.abs(roundTo(result.environment.correctionPsi, 0.5)))} PSI ${direction} pour tenir compte de ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C et ΔAlt ${formatSigned(result.environment.altitudeDeltaM)} m. Les valeurs affichées sont celles à régler au gonflage; cible en conditions de roulage: ${formatPsi(result.targetFrontPsi)} PSI avant et ${formatPsi(result.targetRearPsi)} PSI arrière.`,
+        title: "Correction température.",
+        text: `${formatPsi(Math.abs(roundTo(result.environment.correctionPsi, 0.5)))} PSI ${direction} pour ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C. Cible roulage : ${formatPsi(result.targetFrontPsi)} PSI avant, ${formatPsi(result.targetRearPsi)} PSI arrière.`,
       });
     }
 
     if (result.tireType?.isTpu) {
       alerts.push({
         type: "info",
-        title: "Ajustement TPU inclus.",
-        text: "La pression finale applique un ajustement de -10% pour tenir compte du ressenti plus ferme du TPU et de la possibilité pratique de rouler plus bas qu’en butyl. Montez la chambre avec soin, ne la gonflez pas fortement hors du pneu et évitez les versions ultralight avec freins à patins en longue descente.",
+        title: "Ajustement TPU.",
+        text: "-10% appliqués. Montez sans pincement, ne gonflez pas fort hors du pneu et évitez les TPU ultralight avec freins à patins en longue descente.",
       });
     }
-
 
     if (result.pinchFlatRisk === "extreme") {
       alerts.push({
         type: "danger",
-        title: "Risque extrême de pincement.",
-        text: `Largeur recommandée: ${result.recommendedWidthMm} mm. Si ce n'est pas possible, pressions alternatives: ${formatPsi(result.frontAlternativePsi)} PSI avant et ${formatPsi(result.rearAlternativePsi)} PSI arrière.`,
+        title: "Pincement extrême.",
+        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Sinon : ${formatPsi(result.frontAlternativePsi)} PSI avant, ${formatPsi(result.rearAlternativePsi)} PSI arrière.`,
       });
     } else if (result.pinchFlatRisk === "increased") {
       alerts.push({
         type: "warning",
-        title: "Risque accru de pincement.",
-        text: `Largeur recommandée: ${result.recommendedWidthMm} mm. Alternative non optimale: ${formatPsi(result.frontAlternativePsi)} PSI avant et ${formatPsi(result.rearAlternativePsi)} PSI arrière.`,
+        title: "Pincement possible.",
+        text: `Largeur conseillée : ${result.recommendedWidthMm} mm. Secours : ${formatPsi(result.frontAlternativePsi)} PSI avant, ${formatPsi(result.rearAlternativePsi)} PSI arrière.`,
       });
     }
 
@@ -413,7 +405,7 @@
       alerts.push({
         type: "good",
         title: "Point de départ cohérent.",
-        text: "Aucun signal de risque calculé. Vérifiez tout de même les limites de vos pneus et jantes.",
+        text: "Aucun risque calculé. Vérifiez les limites pneus et jantes.",
       });
     }
 
@@ -423,7 +415,7 @@
   function calculatePressure({ rider, bike, surface, ride }) {
     const massKg = rider.weightKg + bike.bikeAndGearWeightKg;
     if (massKg < 34 || massKg > 205) {
-      return { error: "Le poids total système doit rester entre 34 et 205 kg pour respecter la plage de validation du modèle SILCA." };
+      return { error: "Poids total requis : 34 à 205 kg pour le modèle SILCA." };
     }
 
     const width = bike.tireWidthMm;
@@ -481,19 +473,13 @@
   function getEnvironmentCorrection() {
     const inflationTempC = safeNumber(state.inflationTempC, DEFAULT_STATE.inflationTempC);
     const rideTempC = safeNumber(state.rideTempC, DEFAULT_STATE.rideTempC);
-    const altitudeDeltaM = safeNumber(state.altitudeDeltaM, DEFAULT_STATE.altitudeDeltaM);
     const temperatureDeltaC = rideTempC - inflationTempC;
-    const temperaturePsi = (temperatureDeltaC / 10) * TEMP_PSI_PER_10C;
-    const altitudePsi = (altitudeDeltaM / 1000) * ALTITUDE_PSI_PER_1000M;
-    const correctionPsi = temperaturePsi + altitudePsi;
+    const correctionPsi = (temperatureDeltaC / 10) * TEMP_PSI_PER_10C;
 
     return {
       inflationTempC,
       rideTempC,
-      altitudeDeltaM,
       temperatureDeltaC,
-      temperaturePsi,
-      altitudePsi,
       correctionPsi,
       hasCorrection: Math.abs(correctionPsi) >= 0.25,
     };
@@ -672,7 +658,7 @@
     ].join("\n");
 
     const conditionText = lastResult.environment?.hasCorrection
-      ? `\nCorrection conditions: ${formatSigned(-lastResult.environment.correctionPsi)} PSI à régler vs cible de roulage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C, ${formatSigned(lastResult.environment.altitudeDeltaM)} m)`
+      ? `\nCorrection température : ${formatSigned(-lastResult.environment.correctionPsi)} PSI au gonflage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C)`
       : "";
 
     if (navigator.clipboard?.writeText) {
@@ -751,7 +737,6 @@
       selectedRide: typeof candidate.selectedRide === "string" ? candidate.selectedRide : DEFAULT_STATE.selectedRide,
       inflationTempC: safeNumber(candidate.inflationTempC, DEFAULT_STATE.inflationTempC),
       rideTempC: safeNumber(candidate.rideTempC, DEFAULT_STATE.rideTempC),
-      altitudeDeltaM: safeNumber(candidate.altitudeDeltaM, DEFAULT_STATE.altitudeDeltaM),
     };
   }
 
@@ -804,11 +789,11 @@
   }
 
   function getSelectedSurface() {
-    return findById(SURFACES, state.selectedSurface) || SURFACES[0];
+    return findById(SURFACES, state.selectedSurface) || findById(SURFACES, DEFAULT_STATE.selectedSurface) || SURFACES[0];
   }
 
   function getSelectedRide() {
-    return findById(RIDES, state.selectedRide) || RIDES[2];
+    return findById(RIDES, state.selectedRide) || findById(RIDES, DEFAULT_STATE.selectedRide) || RIDES[0];
   }
 
   function getTireTypeLabel(tireTypeId) {

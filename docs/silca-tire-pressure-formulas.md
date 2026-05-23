@@ -63,6 +63,34 @@ Equivalent:
 C_vitesse = 0.97 + (v_mph - 10) * 0.06 / 23
 ```
 
+## Correction Temperature
+
+Le calculateur SILCA public n'a pas de champ dedie pour la temperature. L'application convertit la cible de roulage en pression a regler au gonflage.
+
+Variables:
+
+| Symbole | Definition |
+| --- | --- |
+| `T_gonflage` | temperature au moment du gonflage, en degres Celsius |
+| `T_sortie` | temperature prevue pendant la sortie, en degres Celsius |
+
+Formules pratiques appliquees:
+
+```text
+delta_temperature_psi = ((T_sortie - T_gonflage) / 10) * 3
+correction_conditions_psi = delta_temperature_psi
+pression_a_regler_psi = pression_cible_roulage_psi - correction_conditions_psi
+```
+
+Interpretation:
+
+| Situation | Effet applique |
+| --- | --- |
+| Sortie plus chaude que le gonflage | Gonfler moins, car la pression montera avec la temperature. |
+| Sortie plus froide que le gonflage | Gonfler plus, car la pression baissera avec la temperature. |
+
+Controle des sources: Rene Herse souligne que la temperature ambiante est une variable majeure des tests pneus; TRS/Josh Poertner et SILCA expliquent l'importance des conditions reelles, de la surface et de l'impedance; Pirelli presente son outil comme une recommandation physique a affiner; PsiCling documente l'ordre de grandeur thermique par loi de Gay-Lussac.
+
 ## Repartition Du Poids
 
 | Option | Coeff. avant | Coeff. arriere |
@@ -78,12 +106,12 @@ La carcasse du pneu, souvent appelee `casing` en anglais, est la structure texti
 
 | Type de pneu | Lecture pratique | Coeff. avant | Coeff. arriere |
 | --- | --- | ---: | ---: |
-| Pneu haut rendement tubeless ou chambre latex | Carcasse tres souple, montage rapide | 1 | 1 |
-| Pneu haut rendement avec chambre TPU legere | Base haut rendement avec ajustement pression TPU de -10% | 0.90 | 0.90 |
-| Pneu standard souple tubeless ou chambre latex | Pneu correct mais moins souple qu'un pneu course | 0.97 | 0.97 |
-| Pneu standard souple avec chambre TPU | Base pneu standard souple avec ajustement pression TPU de -10% | 0.873 | 0.873 |
-| Pneu standard avec chambre butyl | Chambre classique, rendement plus faible | 0.94 | 0.94 |
-| Pneu renforce anti-crevaison | Carcasse rigide ou tres protegee | 0.91 | 0.91 |
+| Haut rendement tubeless/latex | Carcasse tres souple | 1 | 1 |
+| Haut rendement TPU leger | Base haut rendement, TPU -10% | 0.90 | 0.90 |
+| Standard souple tubeless/latex | Pneu courant de bonne qualite | 0.97 | 0.97 |
+| Standard souple TPU | Base standard souple, TPU -10% | 0.873 | 0.873 |
+| Standard butyl | Chambre classique | 0.94 | 0.94 |
+| Renforce anti-crevaison | Carcasse rigide ou protegee | 0.91 | 0.91 |
 
 Note: les coefficients TPU ne sont pas presents dans les quatre choix SILCA originaux. Ils integrent le rapport local `docs/Rapport-impacte-TPU.md`: le TPU ne change pas la logique de base poids x section x terrain, mais il permet souvent de rouler 5 a 10% plus bas qu'un montage butyl de reference pour retrouver un ressenti equivalent, avec plus de confort et de grip. Le calculateur applique donc un ajustement assume de -10% aux options TPU.
 
@@ -105,6 +133,15 @@ P_arriere_psi = CPP * C_vitesse * C_repartition_arriere * C_type_pneu_arriere
 ```
 
 Pour les options TPU, `C_type_pneu` inclut deja l'ajustement de -10% issu du rapport TPU.
+
+Si une correction temperature est active, les valeurs affichees par l'application sont:
+
+```text
+P_avant_affiche_psi = P_avant_psi - correction_conditions_psi
+P_arriere_affiche_psi = P_arriere_psi - correction_conditions_psi
+```
+
+`P_avant_psi` et `P_arriere_psi` restent les cibles en conditions de roulage; les valeurs affichees sont les pressions a regler au gonflage.
 
 Affichage PSI:
 
@@ -198,3 +235,16 @@ Quand un profil velo utilise une chambre TPU, l'application affiche une alerte d
 | Reutilisation dans un pneu plus etroit | Eviter de remonter une TPU deja etiree dans une section plus petite. |
 | Chaleur avec freins a patins | Eviter les TPU ultralight en longues descentes avec freinage sur jante. |
 | Reparation et CO2 | Rustines specifiques; certains fabricants deconseillent l'usage systematique du CO2. |
+
+## Sources Citees
+
+| Source | Utilisation dans l'application |
+| --- | --- |
+| Rene Herse Cycles, Tires and Pressure: new research and what it means (`https://www.renehersecycles.com/tires-and-pressure-new-research-and-what-it-means/`) | Importance des tests en conditions reelles et de la temperature ambiante. |
+| TRS Triathlon, Talking tires with Joshua Poertner (`https://trstriathlon.com/talking-tires-with-joshua-poertner/`) | Relation entre pression, rugosite, impedance et performance; mieux vaut souvent etre un peu trop bas que trop haut. |
+| SILCA, Rolling Resistance: The History and Previous Works (`https://silca.cc/blogs/silca/part-4a-rolling-resistance-the-history-and-previous-works`) | Concept de breakpoint pressure, impedance et pertes dues a la surface. |
+| Pirelli Pressure Tool (`https://www.pirelli.com/tyres/en-gb/bike/pressure-tool`) | Rappel qu'un outil de pression donne une recommandation physique a affiner selon sensations et securite. |
+| PsiCling (`https://psicling.com/en/`) | Ordre de grandeur temperature: environ 0.1 a 0.2 bar par 10 degres Celsius et correction via difference gonflage vers sortie. |
+| Bicycle Rolling Resistance, Tubolito Inner Tube Tests (`https://www.bicyclerollingresistance.com/specials/tubolito`) | Positionnement TPU vs latex et butyl. |
+| Rene Herse / Bicycle Quarterly, TPU Tubes: How fast are they? (`https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/`) | Donnees route TPU vs butyl/latex. |
+| road.cc rapportant AeroCoach (`https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test`) | Donnees TPU vs latex/butyl sur rouleau. |

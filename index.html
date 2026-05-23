@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080d14">
   <title>Calculateur de pression pneus vélo</title>
-  <meta name="description" content="Calculateur mobile de pression pneus vélo en kg, avec profils cyclistes et vélos sauvegardés localement.">
+  <meta name="description" content="Calculateur de pression pneus vélo avec profils locaux, bar et PSI.">
   <link rel="stylesheet" href="styles.css">
   <script defer src="app.js"></script>
 </head>
@@ -14,7 +14,7 @@
     <header class="hero">
       <div>
         <p class="eyebrow">Pression pneus vélo</p>
-        <p class="hero-copy">Choisissez le cycliste, le vélo, le terrain et le type de sortie. Les pressions avant/arrière sont calculées instantanément en bar et en PSI.</p>
+        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Les pressions avant/arrière sont calculées en bar et PSI.</p>
       </div>
       <div class="hero-meter" aria-hidden="true">
         <span class="meter-ring"></span>
@@ -59,9 +59,9 @@
           <div class="panel-heading compact-heading">
             <div>
               <p class="section-kicker">Terrain</p>
-              <h2>Surface de roulage</h2>
+              <h2>Surface</h2>
             </div>
-            <button class="guide-link" type="button" id="openSurfaceGuideButton">Ouvrir le guide visuel</button>
+            <button class="guide-link" type="button" id="openSurfaceGuideButton">Guide visuel</button>
           </div>
           <div class="choice-grid surface-grid" id="surfaceGrid" role="list"></div>
         </article>
@@ -70,7 +70,7 @@
           <div class="panel-heading compact-heading">
             <div>
               <p class="section-kicker">Sortie</p>
-              <h2>Intensité prévue</h2>
+              <h2>Type de sortie</h2>
             </div>
           </div>
           <div class="choice-grid ride-grid" id="rideGrid" role="list"></div>
@@ -80,21 +80,18 @@
           <div class="panel-heading compact-heading">
             <div>
               <p class="section-kicker">Conditions</p>
-              <h2>Température et altitude</h2>
+              <h2>Température</h2>
             </div>
           </div>
           <div class="condition-grid">
-            <label>Température au gonflage °C
+            <label>Température gonflage °C
               <input id="inflationTemp" type="number" inputmode="decimal" min="-20" max="60" step="1">
             </label>
-            <label>Température de sortie °C
+            <label>Température sortie °C
               <input id="rideTemp" type="number" inputmode="decimal" min="-20" max="60" step="1">
             </label>
-            <label>Écart altitude sortie - gonflage, m
-              <input id="altitudeDelta" type="number" inputmode="numeric" min="-2000" max="4000" step="50">
-            </label>
           </div>
-          <p class="field-help">Optionnel. Plus chaud ou plus haut que le lieu de gonflage : on règle un peu moins. Plus froid ou plus bas : on règle un peu plus.</p>
+          <p class="field-help">Optionnel. Sortie plus chaude : gonflez moins. Sortie plus froide : gonflez plus.</p>
         </article>
       </section>
 
@@ -146,14 +143,14 @@
     <section class="formula-section" aria-label="Explication transparente des calculs">
       <div class="formula-intro">
         <p class="section-kicker">Transparence</p>
-        <h2>Calculs et formules utilisées</h2>
-        <p>Les calculs sont effectués dans votre navigateur. Les profils restent dans le stockage local de votre téléphone ou ordinateur.</p>
+        <h2>Formules</h2>
+        <p>Les calculs se font dans le navigateur. Les profils restent en stockage local.</p>
       </div>
 
       <div class="details-grid">
         <details open>
           <summary>Poids total et coefficient de surface</summary>
-          <p>Le poids total est la somme du poids du cycliste et du poids vélo + équipement.</p>
+          <p>Poids total = cycliste + vélo équipé.</p>
           <pre><code>poids_total_kg = poids_cycliste_kg + poids_velo_equipement_kg
 K = 0.5 * (poids_total_kg - 50) + K1</code></pre>
           <div class="table-wrap">
@@ -177,62 +174,61 @@ K = 0.5 * (poids_total_kg - 50) + K1</code></pre>
 
         <details>
           <summary>Pression centrale CPP</summary>
-          <p>La pression de base en PSI est calculée à partir de la largeur mesurée du pneu, du diamètre de roue et du coefficient <code>K</code>.</p>
+          <p>La pression de base en PSI dépend de la largeur mesurée, du diamètre de roue et de <code>K</code>.</p>
           <pre><code>num = (-0.00006*w^3 + 0.0079*w^2 - 0.4102*w + 12.725) * -226.44
 denom = ((-0.5*9.81)/(K*(20/w)) + (w + d/2))^2 - (w + d/2)^2
 CPP = num / denom</code></pre>
-          <p><code>w</code> est la largeur du pneu en mm. <code>d</code> est le diamètre BSD de la roue en mm.</p>
+          <p><code>w</code> = largeur en mm. <code>d</code> = diamètre BSD en mm.</p>
         </details>
 
         <details>
           <summary>Vitesse et type de sortie</summary>
-          <p>Les sorties utilisent les vitesses SILCA d’origine en mph pour le calcul. L’interface affiche des km/h arrondis sans décimales pour rester lisible sur smartphone.</p>
+          <p>Le calcul utilise les vitesses SILCA en mph. L’interface affiche des km/h arrondis.</p>
           <pre><code>C_vitesse = 0.97 + ((v_mph - 10) * 0.06 / 23)</code></pre>
         </details>
 
         <details>
-          <summary>Correction température et altitude</summary>
-          <p>SILCA ne fournit pas de champ dédié dans son calculateur public. L’application ajoute une correction séparée pour convertir la cible de roulage en pression à régler au moment du gonflage.</p>
+          <summary>Correction température</summary>
+          <p>La pression varie avec l’écart entre gonflage et roulage.</p>
           <pre><code>delta_temperature_psi = ((temperature_sortie - temperature_gonflage) / 10) * 3
-delta_altitude_psi = (altitude_sortie - altitude_gonflage) / 1000 * 1.5
-pression_a_regler = pression_cible_roulage - delta_temperature_psi - delta_altitude_psi</code></pre>
-          <p>Exemple : si la sortie est 10 °C plus chaude, la pression montera en roulant, donc l’application retire environ 3 PSI au gonflage. Si la sortie est 1000 m plus haute, la pression relative augmente avec la baisse de pression atmosphérique, donc l’application retire environ 1,5 PSI.</p>
-          <p>Contrôle des sources : Rene Herse souligne que la température ambiante est une variable majeure des tests pneus ; Josh Poertner/SILCA et TRS expliquent pourquoi les conditions réelles et l’impédance de surface dominent le choix de pression ; Pirelli rappelle qu’un outil de pression reste une recommandation à affiner ; PsiCling documente l’ordre de grandeur de la loi de Gay-Lussac ; Engineering Toolbox donne la formule atmosphérique standard utilisée pour justifier l’ordre de grandeur altitude.</p>
+pression_a_regler = pression_cible_roulage - delta_temperature_psi</code></pre>
+          <p>Si la sortie est 10 °C plus chaude, retirez environ 3 PSI au gonflage. Si elle est 10 °C plus froide, ajoutez environ 3 PSI.</p>
         </details>
 
         <details>
           <summary>Répartition du poids et type de pneu</summary>
-          <p>La carcasse du pneu, souvent appelée <code>casing</code> en anglais, est la structure textile sous la bande de roulement. Une carcasse souple se déforme avec moins de pertes, alors qu’un pneu renforcé ou très rigide demande généralement une pression optimale plus basse.</p>
+          <p>La répartition décrit le poids porté par chaque roue. Elle dépend surtout de la posture et du vélo. Plus l’arrière porte, plus sa pression monte.</p>
+          <p>Par défaut : <strong>48/52 · Route</strong>. Prenez <strong>50/50</strong> pour triathlon, CLM ou piste ; <strong>47/53</strong> pour gravel ou position redressée ; <strong>46.5/53.5</strong> pour VTT.</p>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Répartition</th><th>Avant</th><th>Arrière</th></tr>
+                <tr><th>Répartition</th><th>Quand choisir</th><th>Avant</th><th>Arrière</th></tr>
               </thead>
               <tbody>
-                <tr><td>50/50 TT / piste</td><td>1</td><td>1</td></tr>
-                <tr><td>48/52 route</td><td>0.985</td><td>1.01</td></tr>
-                <tr><td>47/53 gravel</td><td>0.975</td><td>1.02</td></tr>
-                <tr><td>46.5/53.5 VTT</td><td>0.97</td><td>1.03</td></tr>
+                <tr><td>50/50 TT / piste</td><td>Position très avancée</td><td>1</td><td>1</td></tr>
+                <tr><td>48/52 route</td><td>Route, endurance, polyvalent</td><td>0.985</td><td>1.01</td></tr>
+                <tr><td>47/53 gravel</td><td>Position redressée, gravel, bagage arrière</td><td>0.975</td><td>1.02</td></tr>
+                <tr><td>46.5/53.5 VTT</td><td>Tout-terrain, poids plus arrière</td><td>0.97</td><td>1.03</td></tr>
               </tbody>
             </table>
           </div>
+          <p>La carcasse est la structure textile du pneu. Plus elle est souple, moins elle dissipe d’énergie.</p>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr><th>Type de pneu</th><th>Lecture pratique</th><th>Coefficient</th></tr>
               </thead>
               <tbody>
-                <tr><td>Pneu haut rendement tubeless ou chambre latex</td><td>Carcasse très souple, montage rapide</td><td>1</td></tr>
-                <tr><td>Pneu haut rendement avec chambre TPU légère</td><td>Base haut rendement avec ajustement pression TPU de −10%</td><td>0.90</td></tr>
-                <tr><td>Pneu standard souple tubeless ou chambre latex</td><td>Pneu correct mais moins souple qu’un pneu course</td><td>0.97</td></tr>
-                <tr><td>Pneu standard souple avec chambre TPU</td><td>Base pneu standard souple avec ajustement pression TPU de −10%</td><td>0.873</td></tr>
-                <tr><td>Pneu standard avec chambre butyl</td><td>Chambre classique, rendement plus faible</td><td>0.94</td></tr>
-                <tr><td>Pneu renforcé anti-crevaison</td><td>Carcasse rigide ou très protégée</td><td>0.91</td></tr>
+                <tr><td>Haut rendement · tubeless/latex</td><td>Carcasse très souple</td><td>1</td></tr>
+                <tr><td>Haut rendement · TPU léger</td><td>Base haut rendement, TPU −10%</td><td>0.90</td></tr>
+                <tr><td>Standard souple · tubeless/latex</td><td>Pneu courant de bonne qualité</td><td>0.97</td></tr>
+                <tr><td>Standard souple · TPU</td><td>Base standard souple, TPU −10%</td><td>0.873</td></tr>
+                <tr><td>Standard · butyl</td><td>Chambre classique</td><td>0.94</td></tr>
+                <tr><td>Renforcé anti-crevaison</td><td>Carcasse rigide ou protégée</td><td>0.91</td></tr>
               </tbody>
             </table>
           </div>
-          <p>Les coefficients TPU ne sont pas dans les quatre choix SILCA originaux. Ils intègrent le rapport local <code>docs/Rapport-impacte-TPU.md</code> : le TPU ne change pas la logique de base poids × section × terrain, mais il permet souvent de rouler 5 à 10% plus bas qu’un montage butyl de référence pour retrouver un ressenti équivalent, avec plus de confort et de grip. Le calcul applique donc un ajustement assumé de −10% aux options TPU.</p>
-          <p>Les tests consultés confirment que le TPU est généralement meilleur que butyl en rendement, souvent proche de latex/tubeless, mais très variable selon le modèle. Si le vélo tape la jante ou semble trop flou, augmentez légèrement la pression.</p>
+          <p>Les options TPU ajoutent un ajustement de −10% aux bases SILCA. Le TPU donne souvent un bon rendement et un ressenti ferme. Si le vélo talonne ou flotte, augmentez légèrement.</p>
           <p>Sources : <a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance</a>, <a href="https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/" target="_blank" rel="noopener">Rene Herse / Bicycle Quarterly</a>, <a href="https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test" target="_blank" rel="noopener">road.cc / AeroCoach</a>.</p>
         </details>
 
@@ -241,7 +237,7 @@ pression_a_regler = pression_cible_roulage - delta_temperature_psi - delta_altit
           <pre><code>P_avant_psi = CPP * C_vitesse * C_repartition_avant * C_type_pneu
 P_arriere_psi = CPP * C_vitesse * C_repartition_arriere * C_type_pneu
 P_bar = P_psi * 0.0689476</code></pre>
-          <p>Les PSI sont arrondis au 0.5 PSI. Les bar sont arrondis au 0.05 bar.</p>
+          <p>PSI arrondis au 0.5. Bar arrondis au 0.05.</p>
         </details>
 
         <details>
@@ -250,26 +246,25 @@ P_bar = P_psi * 0.0689476</code></pre>
 KE = 0.5 * masse_kg * v_ms^2
 RE = 0.5 * (0.8*w) * sqrt(K^2 - (0.8*w)^2)
 PF = 2*RE - KE</code></pre>
-          <p>Si <code>-500 <= PF <= 0</code>, le risque augmente. Si <code>PF < -500</code>, le risque est extrême. L’application affiche alors une largeur de pneu recommandée et des pressions alternatives non optimales. Le rapport TPU indique que le TPU résiste mieux au pincement que le butyl, mais le risque n’est pas nul : les alertes restent donc actives.</p>
+          <p>Si <code>-500 <= PF <= 0</code>, le risque augmente. Si <code>PF < -500</code>, il devient extrême. L’application propose alors une largeur minimale et des pressions de secours.</p>
         </details>
 
         <details>
           <summary>Limites et sécurité</summary>
-          <p>Ce calculateur donne une estimation de départ. Respectez toujours les pressions maximales indiquées par les fabricants de pneus et de jantes. Pour les montages hookless ou tubeless straight side, une pression élevée peut être dangereuse. Avec une chambre TPU, montez soigneusement la chambre, ne la gonflez pas fortement hors du pneu, évitez de réutiliser une chambre déjà étirée dans un pneu plus étroit, et soyez prudent avec les versions ultralight sur jantes à freins à patins en montagne.</p>
+          <p>Ce calculateur donne un point de départ. Respectez les limites pneus et jantes. En hookless, vérifiez la limite fabricant. Avec une chambre TPU, montez sans pincement, ne gonflez pas fort hors du pneu et évitez les TPU ultralight avec freins à patins en longue descente.</p>
         </details>
 
         <details>
           <summary>Sources citées</summary>
           <ul class="source-list">
-            <li><a href="https://www.renehersecycles.com/tires-and-pressure-new-research-and-what-it-means/" target="_blank" rel="noopener">Rene Herse Cycles, Tires and Pressure: new research and what it means</a></li>
-            <li><a href="https://trstriathlon.com/talking-tires-with-joshua-poertner/" target="_blank" rel="noopener">TRS Triathlon, Talking tires with Joshua Poertner</a></li>
-            <li><a href="https://silca.cc/blogs/silca/part-4a-rolling-resistance-the-history-and-previous-works" target="_blank" rel="noopener">SILCA, Rolling Resistance: The History and Previous Works</a></li>
+            <li><a href="https://www.renehersecycles.com/tires-and-pressure-new-research-and-what-it-means/" target="_blank" rel="noopener">Rene Herse, Tires and Pressure</a></li>
+            <li><a href="https://trstriathlon.com/talking-tires-with-joshua-poertner/" target="_blank" rel="noopener">TRS, Josh Poertner</a></li>
+            <li><a href="https://silca.cc/blogs/silca/part-4a-rolling-resistance-the-history-and-previous-works" target="_blank" rel="noopener">SILCA, Rolling Resistance</a></li>
             <li><a href="https://www.pirelli.com/tyres/en-gb/bike/pressure-tool" target="_blank" rel="noopener">Pirelli Pressure Tool</a></li>
-            <li><a href="https://psicling.com/en/" target="_blank" rel="noopener">PsiCling, température et loi de Gay-Lussac</a></li>
-            <li><a href="https://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html" target="_blank" rel="noopener">Engineering Toolbox, Atmospheric Pressure vs. Elevation</a></li>
-            <li><a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance, Tubolito Inner Tube Tests</a></li>
-            <li><a href="https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/" target="_blank" rel="noopener">Rene Herse / Bicycle Quarterly, TPU Tubes: How fast are they?</a></li>
-            <li><a href="https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test" target="_blank" rel="noopener">road.cc / AeroCoach, latex, TPU et butyl</a></li>
+            <li><a href="https://psicling.com/en/" target="_blank" rel="noopener">PsiCling, température</a></li>
+            <li><a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">BRR, Tubolito</a></li>
+            <li><a href="https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/" target="_blank" rel="noopener">Rene Herse, TPU Tubes</a></li>
+            <li><a href="https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test" target="_blank" rel="noopener">road.cc / AeroCoach</a></li>
           </ul>
         </details>
       </div>
@@ -289,7 +284,7 @@ PF = 2*RE - KE</code></pre>
       <label>Nom
         <input id="riderName" type="text" autocomplete="name" required maxlength="40" placeholder="Ex. Julien">
       </label>
-      <label>Poids cycliste en kg
+      <label>Poids cycliste kg
         <input id="riderWeight" type="number" inputmode="decimal" min="20" max="200" step="0.1" required placeholder="Ex. 72.5">
       </label>
       <div class="dialog-actions">
@@ -314,22 +309,23 @@ PF = 2*RE - KE</code></pre>
       <label>Nom du vélo
         <input id="bikeName" type="text" required maxlength="40" placeholder="Ex. Gravel titane">
       </label>
-      <label>Poids vélo + équipement en kg
+      <label>Poids vélo + équipement kg
         <input id="bikeWeight" type="number" inputmode="decimal" min="3" max="60" step="0.1" required placeholder="Ex. 10.8">
       </label>
-      <label>Largeur pneu mesurée en mm
+      <label>Largeur pneu mesurée mm
         <input id="bikeTireWidth" type="number" inputmode="numeric" min="20" max="65" step="1" required placeholder="Ex. 32">
       </label>
       <label>Diamètre de roue
         <select id="bikeWheelDiameter" required></select>
       </label>
       <label>Répartition du poids
-        <select id="bikeWeightDistribution" required></select>
+        <select id="bikeWeightDistribution" required aria-describedby="weightDistributionHelp"></select>
       </label>
+      <p class="field-help" id="weightDistributionHelp">Ce choix décrit la charge avant/arrière. Par défaut : 48/52 · Route. 50/50 pour tri/CLM/piste, 47/53 pour gravel ou position redressée, 46.5/53.5 pour VTT.</p>
       <label>Type de pneu
         <select id="bikeTireType" required></select>
       </label>
-      <p class="field-help">La carcasse est la structure du pneu. Choisissez “haut rendement” pour un pneu course très souple, “standard souple” pour un pneu route/gravel courant, et “renforcé” pour un pneu très protégé.</p>
+      <p class="field-help">Choisissez “haut rendement” pour un pneu course souple, “standard souple” pour un pneu courant, “renforcé” pour un pneu très protégé.</p>
       <div class="dialog-actions">
         <button type="button" class="danger-button" id="deleteBikeButton">Supprimer</button>
         <span></span>
