@@ -17,7 +17,7 @@
     <header class="hero">
       <div>
         <h1 class="eyebrow">Gonflé</h1>
-        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Le détail des formules figure au bas de la page.</p>
+        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Le fonctionnement des calculs est détaillé au bas de la page.</p>
       </div>
       <div class="hero-meter" aria-hidden="true">
         <span class="meter-ring"></span>
@@ -145,8 +145,8 @@
 
     <section class="formula-section" aria-label="Explication transparente des calculs">
       <div class="formula-intro">
-        <p class="section-kicker">Explications</p>
-        <h2>Formules</h2>
+        <p class="section-kicker">Documentation</p>
+        <h2>Modèles & Méthode</h2>
         <p>Les calculs se font dans le navigateur. Les profils restent en stockage local.</p>
       </div>
 
@@ -272,7 +272,7 @@
                 <var>P<sub>recommandée</sub></var> = <var>P<sub>cible</sub></var> − <var>ΔP<sub>temp</sub></var>
               </div>
             </div>
-            <p class="field-help"><strong>Exemple pratique en Suisse romande :</strong> Vous préparez votre vélo à la cave à Lausanne à 14 °C, mais roulez l'après-midi au soleil en Valais ou au bord du lac Léman à 24 °C. L'air se dilatant avec la hausse de $+10$ °C, la formule retranche 3 PSI (environ 0.2 bar) au gonflage pour atteindre la pression idéale sur la route.</p>
+            <p class="field-help"><strong>Exemple pratique :</strong> Vous préparez votre vélo à la cave à Yverdon à 16 °C, mais roulez en plein soleil à Yvonand à 24 °C. L'air se dilatant avec la hausse de 8°C, la formule retranche 2 PSI (environ 0.2 bar) au gonflage pour atteindre la pression idéale sur la route.</p>
           </div>
         </details>
 
@@ -307,6 +307,40 @@
               <li><a href="https://psicling.com/en/" target="_blank" rel="noopener">PsiCling</a> — Physique et thermodynamique des pneumatiques.</li>
               <li><a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance</a> — Tests et rendement des chambres TPU.</li>
             </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Lexique des termes techniques</summary>
+          <div class="details-body">
+            <dl class="lexicon-list">
+              <dt>Hookless (jante sans crochet)</dt>
+              <dd>Technologie de jante à flancs droits (sans crochets intérieurs pour retenir le pneu). Principalement utilisée en tubeless, elle exige des pneus compatibles et limite la pression à un maximum strict de 5 bar (72.5 PSI, souvent limité à 4.8 bar ou 70 PSI) pour éviter tout déjantage.</dd>
+
+              <dt>TPU (Polyuréthane Thermoplastique)</dt>
+              <dd>Matériau plastique moderne extrêmement léger et étanche utilisé pour les chambres à air haut de gamme. Les chambres TPU réduisent considérablement la résistance au roulement (proche du latex) tout en offrant une bonne protection anticrevaison sous un format très compact.</dd>
+
+              <dt>Latex</dt>
+              <dd>Matériau ultra-élastique naturel ou synthétique pour chambres à air. Il offre le meilleur rendement de roulement en minimisant les pertes par déformation (hystérèse). Étant légèrement poreux, il nécessite un regonflage avant chaque sortie.</dd>
+
+              <dt>Butyl</dt>
+              <dd>Élastomère standard et économique utilisé pour la majorité des chambres à air traditionnelles. Il maintient la pression sur de longues périodes mais s'avère plus lourd et génère plus de frictions internes (rendement inférieur).</dd>
+
+              <dt>BSD (Bead Seat Diameter)</dt>
+              <dd>Diamètre nominal de la jante au niveau de l'assise des tringles du pneu en millimètres (ex. 622 mm pour le standard de route dit "700C" ou VTT "29 pouces"). C'est la référence de la norme internationale ETRTO.</dd>
+
+              <dt>Carcasse (Casing)</dt>
+              <dd>Structure souple en fils tissés (ex. coton, nylon) qui constitue le corps du pneu sous la bande de roulement. Sa souplesse et sa densité (mesurée en TPI, fils par pouce) influencent le confort, la résistance au roulement et l'adhérence.</dd>
+
+              <dt>Hystérèse & Impédance</dt>
+              <dd>L'<strong>hystérèse</strong> représente les pertes d'énergie par échauffement lors de la déformation de la carcasse. L'<strong>impédance</strong> correspond aux pertes d'énergie induites par les vibrations et micro-rebonds du vélo sur le relief de la route. Baisser la pression réduit l'impédance mais augmente l'hystérèse ; le calculateur recherche le point d'équilibre optimal.</dd>
+
+              <dt>Pincement (Pinch Flat)</dt>
+              <dd>Aussi appelé "morsure de serpent", c'est une crevaison par perforation qui survient lorsque le pneu s'écrase sur un obstacle (nid-de-poule, caillou) et coince la chambre à air (ou le pneu) entre la jante et l'obstacle.</dd>
+
+              <dt>Tubeless</dt>
+              <dd>Montage de pneu sans chambre à air. Le pneu et la jante étanches forment une chambre unique remplie de liquide préventif anticrevaison. Il permet de rouler à des pressions plus basses avec plus de grip et sans risque de pincement classique.</dd>
+            </dl>
           </div>
         </details>
       </div>

@@ -934,3 +934,24 @@ details a {
 .cpp-explanation strong {
   color: var(--text);
 }
+
+/* Styles pour le Lexique */
+.lexicon-list {
+  display: grid;
+  gap: 16px;
+  margin: 12px 0 6px;
+}
+
+.lexicon-list dt {
+  color: var(--accent);
+  font-weight: 900;
+  font-size: 0.94rem;
+  letter-spacing: 0.02em;
+}
+
+.lexicon-list dd {
+  margin: 0 0 4px 0;
+  color: var(--muted-strong);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
