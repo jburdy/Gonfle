@@ -45,9 +45,9 @@
 
   const TIRE_TYPES = [
     { id: "high-perf-tubeless-latex", label: "Pneu haut rendement · tubeless ou chambre latex", front: 1, rear: 1 },
-    { id: "high-perf-tpu", label: "Pneu haut rendement · chambre TPU légère", front: 0.99, rear: 0.99 },
+    { id: "high-perf-tpu", label: "Pneu haut rendement · chambre TPU légère", front: 0.9, rear: 0.9, isTpu: true },
     { id: "mid-range-tubeless-latex", label: "Pneu standard souple · tubeless ou chambre latex", front: 0.97, rear: 0.97 },
-    { id: "mid-range-tpu", label: "Pneu standard souple · chambre TPU", front: 0.965, rear: 0.965 },
+    { id: "mid-range-tpu", label: "Pneu standard souple · chambre TPU", front: 0.873, rear: 0.873, isTpu: true },
     { id: "mid-range-butyl", label: "Pneu standard · chambre butyl", front: 0.94, rear: 0.94 },
     { id: "puncture-resistant-tubeless-latex", label: "Pneu renforcé anti-crevaison", front: 0.91, rear: 0.91 },
   ];
@@ -299,6 +299,7 @@
     if (rider && bike) {
       chips.push(`Total: ${formatOne(rider.weightKg + bike.bikeAndGearWeightKg)} kg`);
       chips.push(`${bike.tireWidthMm} mm`);
+      chips.push(getTireTypeLabel(bike.tireType));
     }
 
     chips.push(surface.label);
@@ -339,6 +340,15 @@
         text: "Si vous utilisez des jantes hookless ou tubeless straight side, vérifiez impérativement la limite fabricant. SILCA signale une attention au-delà de 70 PSI.",
       });
     }
+
+    if (result.tireType?.isTpu) {
+      alerts.push({
+        type: "info",
+        title: "Ajustement TPU inclus.",
+        text: "La pression finale applique un ajustement de -10% pour tenir compte du ressenti plus ferme du TPU et de la possibilité pratique de rouler plus bas qu’en butyl. Montez la chambre avec soin, ne la gonflez pas fortement hors du pneu et évitez les versions ultralight avec freins à patins en longue descente.",
+      });
+    }
+
 
     if (result.pinchFlatRisk === "extreme") {
       alerts.push({
@@ -395,6 +405,7 @@
       massKg,
       k,
       cpp,
+      tireType,
       frontPsi,
       rearPsi,
       frontBar,
@@ -709,6 +720,10 @@
 
   function getSelectedRide() {
     return findById(RIDES, state.selectedRide) || RIDES[2];
+  }
+
+  function getTireTypeLabel(tireTypeId) {
+    return findById(TIRE_TYPES, tireTypeId)?.label || TIRE_TYPES[0].label;
   }
 
   function findById(items, id) {

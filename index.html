@@ -192,15 +192,16 @@ CPP = num / denom</code></pre>
               </thead>
               <tbody>
                 <tr><td>Pneu haut rendement tubeless ou chambre latex</td><td>Carcasse très souple, montage rapide</td><td>1</td></tr>
-                <tr><td>Pneu haut rendement avec chambre TPU légère</td><td>Très proche latex/tubeless selon les tests route, légèrement plus conservateur</td><td>0.99</td></tr>
+                <tr><td>Pneu haut rendement avec chambre TPU légère</td><td>Base haut rendement avec ajustement pression TPU de −10%</td><td>0.90</td></tr>
                 <tr><td>Pneu standard souple tubeless ou chambre latex</td><td>Pneu correct mais moins souple qu’un pneu course</td><td>0.97</td></tr>
-                <tr><td>Pneu standard souple avec chambre TPU</td><td>TPU généralement meilleur que butyl, souvent proche d’un butyl léger en labo</td><td>0.965</td></tr>
+                <tr><td>Pneu standard souple avec chambre TPU</td><td>Base pneu standard souple avec ajustement pression TPU de −10%</td><td>0.873</td></tr>
                 <tr><td>Pneu standard avec chambre butyl</td><td>Chambre classique, rendement plus faible</td><td>0.94</td></tr>
                 <tr><td>Pneu renforcé anti-crevaison</td><td>Carcasse rigide ou très protégée</td><td>0.91</td></tr>
               </tbody>
             </table>
           </div>
-          <p>Les coefficients TPU ne sont pas dans les quatre choix SILCA originaux. Ils sont ajoutés comme approximation transparente à partir des tests Bicycle Rolling Resistance, Rene Herse/Bicycle Quarterly et AeroCoach rapporté par road.cc : TPU est meilleur que butyl, mais varie selon le modèle. Le TPU léger est proche de latex/tubeless, le TPU standard reste plus conservateur.</p>
+          <p>Les coefficients TPU ne sont pas dans les quatre choix SILCA originaux. Ils intègrent le rapport local <code>docs/Rapport-impacte-TPU.md</code> : le TPU ne change pas la logique de base poids × section × terrain, mais il permet souvent de rouler 5 à 10% plus bas qu’un montage butyl de référence pour retrouver un ressenti équivalent, avec plus de confort et de grip. Le calcul applique donc un ajustement assumé de −10% aux options TPU.</p>
+          <p>Les tests consultés confirment que le TPU est généralement meilleur que butyl en rendement, souvent proche de latex/tubeless, mais très variable selon le modèle. Si le vélo tape la jante ou semble trop flou, augmentez légèrement la pression.</p>
           <p>Sources : <a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance</a>, <a href="https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/" target="_blank" rel="noopener">Rene Herse / Bicycle Quarterly</a>, <a href="https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test" target="_blank" rel="noopener">road.cc / AeroCoach</a>.</p>
         </details>
 
@@ -218,12 +219,12 @@ P_bar = P_psi * 0.0689476</code></pre>
 KE = 0.5 * masse_kg * v_ms^2
 RE = 0.5 * (0.8*w) * sqrt(K^2 - (0.8*w)^2)
 PF = 2*RE - KE</code></pre>
-          <p>Si <code>-500 <= PF <= 0</code>, le risque augmente. Si <code>PF < -500</code>, le risque est extrême. L’application affiche alors une largeur de pneu recommandée et des pressions alternatives non optimales.</p>
+          <p>Si <code>-500 <= PF <= 0</code>, le risque augmente. Si <code>PF < -500</code>, le risque est extrême. L’application affiche alors une largeur de pneu recommandée et des pressions alternatives non optimales. Le rapport TPU indique que le TPU résiste mieux au pincement que le butyl, mais le risque n’est pas nul : les alertes restent donc actives.</p>
         </details>
 
         <details>
           <summary>Limites et sécurité</summary>
-          <p>Ce calculateur donne une estimation de départ. Respectez toujours les pressions maximales indiquées par les fabricants de pneus et de jantes. Pour les montages hookless ou tubeless straight side, une pression élevée peut être dangereuse.</p>
+          <p>Ce calculateur donne une estimation de départ. Respectez toujours les pressions maximales indiquées par les fabricants de pneus et de jantes. Pour les montages hookless ou tubeless straight side, une pression élevée peut être dangereuse. Avec une chambre TPU, montez soigneusement la chambre, ne la gonflez pas fortement hors du pneu, évitez de réutiliser une chambre déjà étirée dans un pneu plus étroit, et soyez prudent avec les versions ultralight sur jantes à freins à patins en montagne.</p>
         </details>
       </div>
     </section>

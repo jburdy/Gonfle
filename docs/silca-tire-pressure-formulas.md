@@ -79,13 +79,15 @@ La carcasse du pneu, souvent appelee `casing` en anglais, est la structure texti
 | Type de pneu | Lecture pratique | Coeff. avant | Coeff. arriere |
 | --- | --- | ---: | ---: |
 | Pneu haut rendement tubeless ou chambre latex | Carcasse tres souple, montage rapide | 1 | 1 |
-| Pneu haut rendement avec chambre TPU legere | TPU performance, tres proche latex/tubeless mais legerement conservateur | 0.99 | 0.99 |
+| Pneu haut rendement avec chambre TPU legere | Base haut rendement avec ajustement pression TPU de -10% | 0.90 | 0.90 |
 | Pneu standard souple tubeless ou chambre latex | Pneu correct mais moins souple qu'un pneu course | 0.97 | 0.97 |
-| Pneu standard souple avec chambre TPU | TPU standard, generalement meilleur que butyl | 0.965 | 0.965 |
+| Pneu standard souple avec chambre TPU | Base pneu standard souple avec ajustement pression TPU de -10% | 0.873 | 0.873 |
 | Pneu standard avec chambre butyl | Chambre classique, rendement plus faible | 0.94 | 0.94 |
 | Pneu renforce anti-crevaison | Carcasse rigide ou tres protegee | 0.91 | 0.91 |
 
-Note: les coefficients TPU ne sont pas presents dans les quatre choix SILCA originaux. Ils sont ajoutes comme approximation transparente. Les recherches consultees indiquent que le TPU est meilleur que le butyl, mais varie beaucoup selon le modele: Bicycle Rolling Resistance trouve les Tubolito standard proches du butyl leger et les S-Tubo proches du latex; Rene Herse/Bicycle Quarterly trouve ses TPU prototypes indistinguables de latex ultra-fin en test route; AeroCoach, rapporte par road.cc, trouve Tubolito meilleur que butyl mais moins rapide que latex. Le calculateur distingue donc TPU leger/performance (`0.99`) et TPU standard (`0.965`).
+Note: les coefficients TPU ne sont pas presents dans les quatre choix SILCA originaux. Ils integrent le rapport local `docs/Rapport-impacte-TPU.md`: le TPU ne change pas la logique de base poids x section x terrain, mais il permet souvent de rouler 5 a 10% plus bas qu'un montage butyl de reference pour retrouver un ressenti equivalent, avec plus de confort et de grip. Le calculateur applique donc un ajustement assume de -10% aux options TPU.
+
+Les recherches consultees indiquent aussi que le TPU est meilleur que le butyl en rendement, mais varie beaucoup selon le modele: Bicycle Rolling Resistance trouve les Tubolito standard proches du butyl leger et les S-Tubo proches du latex; Rene Herse/Bicycle Quarterly trouve ses TPU prototypes indistinguables de latex ultra-fin en test route; AeroCoach, rapporte par road.cc, trouve Tubolito meilleur que butyl mais moins rapide que latex. Le calculateur distingue donc TPU leger/performance (`0.90`) et TPU standard (`0.873`).
 
 Sources consultees pour TPU:
 
@@ -101,6 +103,8 @@ Sources consultees pour TPU:
 P_avant_psi = CPP * C_vitesse * C_repartition_avant * C_type_pneu_avant
 P_arriere_psi = CPP * C_vitesse * C_repartition_arriere * C_type_pneu_arriere
 ```
+
+Pour les options TPU, `C_type_pneu` inclut deja l'ajustement de -10% issu du rapport TPU.
 
 Affichage PSI:
 
@@ -155,6 +159,8 @@ sinon:
     pas de message de risque
 ```
 
+Le rapport TPU indique que les chambres TPU sont moins sujettes au pincement que le butyl a pression equivalente, mais le risque n'est pas nul. Le calculateur conserve donc les alertes de pincement au lieu de modifier les seuils `PF`.
+
 ## Largeur Recommandee Si Risque De Pinch Flat
 
 Le site recommande une largeur minimale arrondie au mm superieur:
@@ -181,3 +187,14 @@ P_arriere_non_optimale = ratio * P_arriere_psi
 ```
 
 Ces deux valeurs sont affichees arrondies au `0.5 PSI`.
+
+## Risques Specifiques TPU Integres Aux Explications
+
+Quand un profil velo utilise une chambre TPU, l'application affiche une alerte de contexte. Les points repris du rapport local sont:
+
+| Risque | Consequence pratique |
+| --- | --- |
+| Montage delicat | Ne pas pincer la chambre entre pneu et jante; ne pas la gonfler fortement hors du pneu. |
+| Reutilisation dans un pneu plus etroit | Eviter de remonter une TPU deja etiree dans une section plus petite. |
+| Chaleur avec freins a patins | Eviter les TPU ultralight en longues descentes avec freinage sur jante. |
+| Reparation et CO2 | Rustines specifiques; certains fabricants deconseillent l'usage systematique du CO2. |

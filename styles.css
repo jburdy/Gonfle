@@ -590,6 +590,11 @@ button.guide-link {
   background: rgba(87, 242, 154, 0.08);
 }
 
+.alert.info {
+  border-color: rgba(76, 201, 255, 0.34);
+  background: rgba(76, 201, 255, 0.08);
+}
+
 .alert.warning {
   border-color: rgba(255, 184, 77, 0.42);
   background: rgba(255, 184, 77, 0.1);
