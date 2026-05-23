@@ -42,7 +42,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Stratégie Stale-While-Revalidate : réponse rapide via le cache, mise à jour en tâche de fond
+// Stratégies de cache différenciées selon la ressource (NetworkFirst pour HTML/Manifest, StaleWhileRevalidate pour le reste)
 self.addEventListener("fetch", (event) => {
   // Ignorer les requêtes qui ne sont pas de type GET (par exemple les requêtes d'outils de dev)
   if (event.request.method !== "GET") {
@@ -55,22 +55,42 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cachedResponse) => {
-        const fetchedResponse = fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => {
-            // Échec silencieux si hors-ligne
-          });
+  const isHtmlOrManifest = event.request.mode === "navigate" ||
+                           url.pathname.endsWith("/manifest.json");
 
-        return cachedResponse || fetchedResponse;
-      });
-    })
-  );
+  if (isHtmlOrManifest) {
+    // Stratégie NetworkFirst pour le HTML et le manifest pour toujours avoir la version la plus fraîche si connecté
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse.clone()));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // Stratégie Stale-While-Revalidate pour les ressources statiques (images, css, js)
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cachedResponse) => {
+          const fetchedResponse = fetch(event.request)
+            .then((networkResponse) => {
+              if (networkResponse.status === 200) {
+                cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => {
+              // Échec silencieux si hors-ligne
+            });
+
+          return cachedResponse || fetchedResponse;
+        });
+      })
+    );
+  }
 });
