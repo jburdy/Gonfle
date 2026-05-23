@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080d14">
   <title>Calculateur de pression pneus vélo</title>
-  <meta name="description" content="Calculateur de pression pneus vélo avec profils locaux, bar et PSI.">
+  <meta name="description" content="Calculateur de pression pneus vélo avec profils locaux, PSI et bar.">
   <link rel="stylesheet" href="styles.css">
   <script defer src="app.js"></script>
 </head>
@@ -14,12 +14,12 @@
     <header class="hero">
       <div>
         <p class="eyebrow">Pression pneus vélo</p>
-        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Les pressions avant/arrière sont calculées en bar et PSI.</p>
+        <p class="hero-copy">Renseignez cycliste, vélo, terrain et sortie. Les pressions avant/arrière sont calculées en PSI et bar.</p>
       </div>
       <div class="hero-meter" aria-hidden="true">
         <span class="meter-ring"></span>
         <span class="meter-needle"></span>
-        <span class="meter-label">BAR</span>
+        <span class="meter-label">PSI</span>
       </div>
     </header>
 
@@ -115,20 +115,20 @@
             <div class="pressure-tile front-tile">
               <div class="tile-topline">
                 <span>Avant</span>
-                <span id="frontPsi" class="psi-value">-- PSI</span>
+                <span id="frontBar" class="secondary-pressure">-- bar</span>
               </div>
-              <strong id="frontBar">--</strong>
-              <span class="unit">bar</span>
+              <strong id="frontPsi">--</strong>
+              <span class="unit">PSI</span>
               <div class="gauge-track"><span id="frontGauge" class="gauge-fill"></span></div>
             </div>
 
             <div class="pressure-tile rear-tile">
               <div class="tile-topline">
                 <span>Arrière</span>
-                <span id="rearPsi" class="psi-value">-- PSI</span>
+                <span id="rearBar" class="secondary-pressure">-- bar</span>
               </div>
-              <strong id="rearBar">--</strong>
-              <span class="unit">bar</span>
+              <strong id="rearPsi">--</strong>
+              <span class="unit">PSI</span>
               <div class="gauge-track"><span id="rearGauge" class="gauge-fill"></span></div>
             </div>
           </div>
@@ -183,7 +183,7 @@ CPP = num / denom</code></pre>
 
         <details>
           <summary>Vitesse et type de sortie</summary>
-          <p>Le calcul utilise les vitesses SILCA en mph. L’interface affiche des km/h arrondis.</p>
+          <p>Le calcul utilise des vitesses en mph. L’interface affiche des km/h arrondis.</p>
           <pre><code>C_vitesse = 0.97 + ((v_mph - 10) * 0.06 / 23)</code></pre>
         </details>
 
@@ -237,7 +237,7 @@ pression_a_regler = pression_cible_roulage - delta_temperature_psi</code></pre>
           <pre><code>P_avant_psi = CPP * C_vitesse * C_repartition_avant * C_type_pneu
 P_arriere_psi = CPP * C_vitesse * C_repartition_arriere * C_type_pneu
 P_bar = P_psi * 0.0689476</code></pre>
-          <p>PSI arrondis au 0.5. Bar arrondis au 0.05.</p>
+          <p>PSI arrondis sans décimale. Bar arrondis à une décimale.</p>
         </details>
 
         <details>

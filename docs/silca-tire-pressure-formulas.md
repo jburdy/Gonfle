@@ -11,7 +11,7 @@ Source analysee: `https://silca.cc/pages/pro-tire-pressure-calculator`, bloc Jav
 | Poids total systeme | kg. Si l'utilisateur saisit des livres: `kg = lbs * 0.453592`. Valide de 34 a 205 kg. |
 | Largeur pneu mesuree | mm, options 20 a 65. |
 | Diametre roue | BSD en mm: 622 pour 700C/29", 571 pour 650C, 584 pour 650B/27.5", 559 pour 26". |
-| Vitesse moyenne | mph, options 14, 15.5, 17.5, 19.5, 21.5, 24. |
+| Vitesse moyenne | mph, options 12.5, 15.5, 17.5, 19.5, 21.5, 24. |
 
 ## Coefficient De Surface
 
@@ -51,7 +51,7 @@ CPP = num / denom
 ## Coefficient De Vitesse
 
 Le site fait une interpolation lineaire entre `(10 mph, 0.97)` et `(33 mph, 1.03)`.
-Dans l'application, les vitesses sont affichees en km/h arrondis sans decimales, mais les valeurs mph d'origine restent utilisees pour le calcul.
+Dans l'application, les vitesses sont stockees en mph et affichees en km/h arrondis. Le choix `Detente` utilise `12.5 mph`, soit environ `20 km/h`.
 
 ```text
 C_vitesse = 0.97 + ((v_mph - 10) * (1.03 - 0.97) / (33 - 10))
@@ -146,16 +146,16 @@ P_arriere_affiche_psi = P_arriere_psi - correction_conditions_psi
 Affichage PSI:
 
 ```text
-PSI_affiche = round(P_psi * 2) / 2
+PSI_affiche = round(P_psi)
 ```
 
 Affichage BAR:
 
 ```text
-BAR_affiche = round((P_psi * 0.0689476) * 20) / 20
+BAR_affiche = round((P_psi * 0.0689476) * 10) / 10
 ```
 
-Le code du site appelle une fonction `round(value, 1)` pour les BAR, mais son implementation arrondit en fait au pas de `0.05 bar`.
+L'interface met les PSI en valeur principale sans decimale. Les bar sont affiches en secondaire avec une decimale.
 
 ## Alerte Hookless
 
@@ -223,7 +223,7 @@ P_avant_non_optimale = ratio * P_avant_psi
 P_arriere_non_optimale = ratio * P_arriere_psi
 ```
 
-Ces deux valeurs sont affichees arrondies au `0.5 PSI`.
+Ces deux valeurs sont affichees arrondies au PSI entier.
 
 ## Risques Specifiques TPU Integres Aux Explications
 

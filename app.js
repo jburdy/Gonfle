@@ -11,19 +11,19 @@
   const TEMP_PSI_PER_10C = 3;
 
   const SURFACES = [
-    { id: "new-pavement", label: "Route neuve", detail: "Asphalte lisse · K1 261", k1: 261 },
-    { id: "worn-pavement", label: "Route usée", detail: "Fissures légères · K1 246.5", k1: 246.5 },
-    { id: "cat1-gravel", label: "Gravel cat. 1", detail: "Compact rapide · K1 235.5", k1: 235.5 },
-    { id: "poor-pavement", label: "Chipseal", detail: "Route rugueuse · K1 225", k1: 225 },
-    { id: "cat2-gravel", label: "Gravel cat. 2", detail: "Roulant irrégulier · K1 212.5", k1: 212.5 },
-    { id: "cobblestone", label: "Pavés", detail: "Rugueux · K1 199", k1: 199 },
-    { id: "cat3-gravel", label: "Gravel cat. 3", detail: "Cassant · K1 187", k1: 187 },
-    { id: "cat4-gravel", label: "Gravel cat. 4", detail: "Très dégradé · K1 170", k1: 170 },
+    { id: "new-pavement", label: "Route neuve", detail: "Asphalte lisse · propre · rapide", k1: 261 },
+    { id: "worn-pavement", label: "Route usée", detail: "Fissures légères · raccords · granuleux", k1: 246.5 },
+    { id: "cat1-gravel", label: "Gravel cat. 1", detail: "Compact rapide · fin · sec", k1: 235.5 },
+    { id: "poor-pavement", label: "Chipseal", detail: "Route rugueuse · gravillons · vibrations", k1: 225 },
+    { id: "cat2-gravel", label: "Gravel cat. 2", detail: "Roulant irrégulier · cailloux fins", k1: 212.5 },
+    { id: "cobblestone", label: "Pavés", detail: "Rugueux · joints · secousses", k1: 199 },
+    { id: "cat3-gravel", label: "Gravel cat. 3", detail: "Cassant · pierres · trous", k1: 187 },
+    { id: "cat4-gravel", label: "Gravel cat. 4", detail: "Très dégradé · meuble · technique", k1: 170 },
   ];
 
   const RIDES = [
-    { id: "recreational", label: "Détente", detail: "≈ 22 km/h", speedMph: 14 },
-    { id: "fast-singletrack", label: "Singletrack", detail: "≈ 24 km/h", speedMph: 15.5 },
+    { id: "recreational", label: "Détente", detail: "≈ 20 km/h", speedMph: 12.5 },
+    { id: "fast-singletrack", label: "Endurance", detail: "≈ 25 km/h", speedMph: 15.5 },
     { id: "moderate-group", label: "Groupe modéré", detail: "≈ 28 km/h", speedMph: 17.5 },
     { id: "fast-group", label: "Groupe rapide", detail: "≈ 31 km/h", speedMph: 19.5 },
     { id: "race", label: "Course", detail: "≈ 34 km/h", speedMph: 21.5 },
@@ -65,8 +65,8 @@
   };
 
   const numberFormats = {
-    bar: new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    psi: new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+    bar: new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+    psi: new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
     one: new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 1 }),
   };
 
@@ -307,10 +307,10 @@
     refs.pressureResults.classList.remove("is-hidden");
     refs.copyButton.classList.remove("is-hidden");
 
-    refs.frontBar.textContent = formatBar(result.frontBar);
-    refs.rearBar.textContent = formatBar(result.rearBar);
-    refs.frontPsi.textContent = `${formatPsi(result.frontPsi)} PSI`;
-    refs.rearPsi.textContent = `${formatPsi(result.rearPsi)} PSI`;
+    refs.frontBar.textContent = `${formatBar(result.frontBar)} bar`;
+    refs.rearBar.textContent = `${formatBar(result.rearBar)} bar`;
+    refs.frontPsi.textContent = formatPsi(result.frontPsi);
+    refs.rearPsi.textContent = formatPsi(result.rearPsi);
     refs.frontGauge.style.width = `${pressureGaugePercent(result.frontBar)}%`;
     refs.rearGauge.style.width = `${pressureGaugePercent(result.rearBar)}%`;
     renderAlerts(createResultAlerts(result));
@@ -371,11 +371,11 @@
     }
 
     if (result.environment?.hasCorrection) {
-      const direction = result.environment.correctionPsi > 0 ? "retirée" : "ajoutée";
+      const direction = result.environment.correctionPsi > 0 ? "à retirer" : "à ajouter";
       alerts.push({
         type: "info",
         title: "Correction température.",
-        text: `${formatPsi(Math.abs(roundTo(result.environment.correctionPsi, 0.5)))} PSI ${direction} pour ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C. Cible roulage : ${formatPsi(result.targetFrontPsi)} PSI avant, ${formatPsi(result.targetRearPsi)} PSI arrière.`,
+        text: `${formatPsi(Math.abs(roundTo(result.environment.correctionPsi, 1)))} PSI ${direction} pour ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C. Cible roulage : ${formatPsi(result.targetFrontPsi)} PSI avant, ${formatPsi(result.targetRearPsi)} PSI arrière.`,
       });
     }
 
@@ -431,18 +431,18 @@
     const targetRawRearPsi = cpp * speedCoefficient * distribution.rear * tireType.rear;
     const rawFrontPsi = Math.max(0, targetRawFrontPsi - environment.correctionPsi);
     const rawRearPsi = Math.max(0, targetRawRearPsi - environment.correctionPsi);
-    const frontPsi = roundTo(rawFrontPsi, 0.5);
-    const rearPsi = roundTo(rawRearPsi, 0.5);
-    const frontBar = roundTo(rawFrontPsi * PSI_TO_BAR, 0.05);
-    const rearBar = roundTo(rawRearPsi * PSI_TO_BAR, 0.05);
-    const targetFrontPsi = roundTo(targetRawFrontPsi, 0.5);
-    const targetRearPsi = roundTo(targetRawRearPsi, 0.5);
+    const frontPsi = roundTo(rawFrontPsi, 1);
+    const rearPsi = roundTo(rawRearPsi, 1);
+    const frontBar = roundTo(rawFrontPsi * PSI_TO_BAR, 0.1);
+    const rearBar = roundTo(rawRearPsi * PSI_TO_BAR, 0.1);
+    const targetFrontPsi = roundTo(targetRawFrontPsi, 1);
+    const targetRearPsi = roundTo(targetRawRearPsi, 1);
     const pinchFlat = calculatePinchFlat({ massKg, speedMph: ride.speedMph, width, k, rawFrontPsi: targetRawFrontPsi, rawRearPsi: targetRawRearPsi });
     if (pinchFlat.frontAlternativePsi !== undefined) {
       pinchFlat.targetFrontAlternativePsi = pinchFlat.frontAlternativePsi;
       pinchFlat.targetRearAlternativePsi = pinchFlat.rearAlternativePsi;
-      pinchFlat.frontAlternativePsi = roundTo(Math.max(0, pinchFlat.frontAlternativePsi - environment.correctionPsi), 0.5);
-      pinchFlat.rearAlternativePsi = roundTo(Math.max(0, pinchFlat.rearAlternativePsi - environment.correctionPsi), 0.5);
+      pinchFlat.frontAlternativePsi = roundTo(Math.max(0, pinchFlat.frontAlternativePsi - environment.correctionPsi), 1);
+      pinchFlat.rearAlternativePsi = roundTo(Math.max(0, pinchFlat.rearAlternativePsi - environment.correctionPsi), 1);
     }
 
     return {
@@ -520,8 +520,8 @@
       pinchFlatRisk,
       pinchFlatFactor,
       recommendedWidthMm: Math.ceil(recommendedWidth),
-      frontAlternativePsi: roundTo(alternativeRatio * rawFrontPsi, 0.5),
-      rearAlternativePsi: roundTo(alternativeRatio * rawRearPsi, 0.5),
+      frontAlternativePsi: roundTo(alternativeRatio * rawFrontPsi, 1),
+      rearAlternativePsi: roundTo(alternativeRatio * rawRearPsi, 1),
     };
   }
 
@@ -653,12 +653,12 @@
       `Cycliste: ${lastResult.rider.name}`,
       `Terrain: ${lastResult.surface.label}`,
       `Sortie: ${lastResult.ride.label}`,
-      `Avant: ${formatBar(lastResult.frontBar)} bar (${formatPsi(lastResult.frontPsi)} PSI)`,
-      `Arrière: ${formatBar(lastResult.rearBar)} bar (${formatPsi(lastResult.rearPsi)} PSI)`,
+      `Avant: ${formatPsi(lastResult.frontPsi)} PSI (${formatBar(lastResult.frontBar)} bar)`,
+      `Arrière: ${formatPsi(lastResult.rearPsi)} PSI (${formatBar(lastResult.rearBar)} bar)`,
     ].join("\n");
 
     const conditionText = lastResult.environment?.hasCorrection
-      ? `\nCorrection température : ${formatSigned(-lastResult.environment.correctionPsi)} PSI au gonflage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C)`
+      ? `\nCorrection température : ${formatSignedPsi(-lastResult.environment.correctionPsi)} PSI au gonflage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C)`
       : "";
 
     if (navigator.clipboard?.writeText) {
@@ -855,6 +855,11 @@
   function formatSigned(value) {
     const rounded = Math.round(value * 10) / 10;
     return `${rounded > 0 ? "+" : ""}${formatOne(rounded)}`;
+  }
+
+  function formatSignedPsi(value) {
+    const rounded = roundTo(value, 1);
+    return `${rounded > 0 ? "+" : ""}${formatPsi(rounded)}`;
   }
 
   function showDialog(dialog) {

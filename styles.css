@@ -527,7 +527,7 @@ button.guide-link {
   text-transform: uppercase;
 }
 
-.psi-value {
+.secondary-pressure {
   color: var(--accent-2);
   font-size: 0.8rem;
 }
