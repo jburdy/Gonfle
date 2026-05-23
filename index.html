@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d14">
+  <title>Calculateur de pression pneus vélo</title>
+  <meta name="description" content="Calculateur mobile de pression pneus vélo en kg, avec profils cyclistes et vélos sauvegardés localement.">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Pression pneus vélo</p>
+        <p class="hero-copy">Choisissez le cycliste, le vélo, le terrain et le type de sortie. Les pressions avant/arrière sont calculées instantanément en bar et en PSI.</p>
+      </div>
+      <div class="hero-meter" aria-hidden="true">
+        <span class="meter-ring"></span>
+        <span class="meter-needle"></span>
+        <span class="meter-label">BAR</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="control-stack" aria-label="Paramètres du calculateur">
+        <article class="panel profile-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">Profils</p>
+              <h2>Cycliste et vélo</h2>
+            </div>
+            <span class="privacy-chip">Stockage local</span>
+          </div>
+
+          <div class="profile-grid">
+            <div class="field-block">
+              <label for="riderSelect">Cycliste</label>
+              <div class="select-actions">
+                <select id="riderSelect"></select>
+                <button class="icon-button" type="button" id="editRiderButton" aria-label="Modifier le cycliste sélectionné">Modifier</button>
+                <button class="primary-small" type="button" id="addRiderButton">+ Cycliste</button>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <label for="bikeSelect">Vélo</label>
+              <div class="select-actions">
+                <select id="bikeSelect"></select>
+                <button class="icon-button" type="button" id="editBikeButton" aria-label="Modifier le vélo sélectionné">Modifier</button>
+                <button class="primary-small" type="button" id="addBikeButton">+ Vélo</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="section-kicker">Terrain</p>
+              <h2>Surface de roulage</h2>
+            </div>
+            <a class="guide-link" href="assets/surface-conditions.webp" target="_blank" rel="noopener">Ouvrir le guide visuel</a>
+          </div>
+          <div class="choice-grid surface-grid" id="surfaceGrid" role="list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="section-kicker">Sortie</p>
+              <h2>Intensité prévue</h2>
+            </div>
+          </div>
+          <div class="choice-grid ride-grid" id="rideGrid" role="list"></div>
+        </article>
+      </section>
+
+      <aside class="result-panel" aria-live="polite">
+        <div class="result-card">
+          <div class="result-heading">
+            <div>
+              <p class="section-kicker">Résultat</p>
+              <h2>Pression recommandée</h2>
+            </div>
+            <button class="ghost-button" type="button" id="resetButton">Réinitialiser</button>
+          </div>
+
+          <div class="selection-summary" id="selectionSummary"></div>
+
+          <div class="empty-state" id="emptyState">
+            <p>Ajoutez un cycliste et un vélo pour lancer le calcul.</p>
+          </div>
+
+          <div class="pressure-results is-hidden" id="pressureResults">
+            <div class="pressure-tile front-tile">
+              <div class="tile-topline">
+                <span>Avant</span>
+                <span id="frontPsi" class="psi-value">-- PSI</span>
+              </div>
+              <strong id="frontBar">--</strong>
+              <span class="unit">bar</span>
+              <div class="gauge-track"><span id="frontGauge" class="gauge-fill"></span></div>
+            </div>
+
+            <div class="pressure-tile rear-tile">
+              <div class="tile-topline">
+                <span>Arrière</span>
+                <span id="rearPsi" class="psi-value">-- PSI</span>
+              </div>
+              <strong id="rearBar">--</strong>
+              <span class="unit">bar</span>
+              <div class="gauge-track"><span id="rearGauge" class="gauge-fill"></span></div>
+            </div>
+          </div>
+
+          <div class="alerts" id="alerts"></div>
+
+          <button class="copy-button is-hidden" type="button" id="copyButton">Copier les pressions</button>
+        </div>
+      </aside>
+    </main>
+
+    <section class="formula-section" aria-label="Explication transparente des calculs">
+      <div class="formula-intro">
+        <p class="section-kicker">Transparence</p>
+        <h2>Calculs et formules utilisées</h2>
+        <p>Les calculs sont effectués dans votre navigateur. Les profils restent dans le stockage local de votre téléphone ou ordinateur.</p>
+      </div>
+
+      <div class="details-grid">
+        <details open>
+          <summary>Poids total et coefficient de surface</summary>
+          <p>Le poids total est la somme du poids du cycliste et du poids vélo + équipement.</p>
+          <pre><code>poids_total_kg = poids_cycliste_kg + poids_velo_equipement_kg
+K = 0.5 * (poids_total_kg - 50) + K1</code></pre>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Surface</th><th>K1</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Route neuve</td><td>261</td></tr>
+                <tr><td>Route usée</td><td>246.5</td></tr>
+                <tr><td>Gravel catégorie 1</td><td>235.5</td></tr>
+                <tr><td>Route abîmée / chipseal</td><td>225</td></tr>
+                <tr><td>Gravel catégorie 2</td><td>212.5</td></tr>
+                <tr><td>Pavés</td><td>199</td></tr>
+                <tr><td>Gravel catégorie 3</td><td>187</td></tr>
+                <tr><td>Gravel catégorie 4</td><td>170</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details>
+          <summary>Pression centrale CPP</summary>
+          <p>La pression de base en PSI est calculée à partir de la largeur mesurée du pneu, du diamètre de roue et du coefficient <code>K</code>.</p>
+          <pre><code>num = (-0.00006*w^3 + 0.0079*w^2 - 0.4102*w + 12.725) * -226.44
+denom = ((-0.5*9.81)/(K*(20/w)) + (w + d/2))^2 - (w + d/2)^2
+CPP = num / denom</code></pre>
+          <p><code>w</code> est la largeur du pneu en mm. <code>d</code> est le diamètre BSD de la roue en mm.</p>
+        </details>
+
+        <details>
+          <summary>Vitesse et type de sortie</summary>
+          <p>Les sorties utilisent les vitesses SILCA d’origine en mph pour le calcul. L’interface affiche des km/h arrondis sans décimales pour rester lisible sur smartphone.</p>
+          <pre><code>C_vitesse = 0.97 + ((v_mph - 10) * 0.06 / 23)</code></pre>
+        </details>
+
+        <details>
+          <summary>Répartition du poids et type de pneu</summary>
+          <p>La carcasse du pneu, souvent appelée <code>casing</code> en anglais, est la structure textile sous la bande de roulement. Une carcasse souple se déforme avec moins de pertes, alors qu’un pneu renforcé ou très rigide demande généralement une pression optimale plus basse.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Répartition</th><th>Avant</th><th>Arrière</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>50/50 TT / piste</td><td>1</td><td>1</td></tr>
+                <tr><td>48/52 route</td><td>0.985</td><td>1.01</td></tr>
+                <tr><td>47/53 gravel</td><td>0.975</td><td>1.02</td></tr>
+                <tr><td>46.5/53.5 VTT</td><td>0.97</td><td>1.03</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Type de pneu</th><th>Lecture pratique</th><th>Coefficient</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Pneu haut rendement tubeless ou chambre latex</td><td>Carcasse très souple, montage rapide</td><td>1</td></tr>
+                <tr><td>Pneu haut rendement avec chambre TPU légère</td><td>Très proche latex/tubeless selon les tests route, légèrement plus conservateur</td><td>0.99</td></tr>
+                <tr><td>Pneu standard souple tubeless ou chambre latex</td><td>Pneu correct mais moins souple qu’un pneu course</td><td>0.97</td></tr>
+                <tr><td>Pneu standard souple avec chambre TPU</td><td>TPU généralement meilleur que butyl, souvent proche d’un butyl léger en labo</td><td>0.965</td></tr>
+                <tr><td>Pneu standard avec chambre butyl</td><td>Chambre classique, rendement plus faible</td><td>0.94</td></tr>
+                <tr><td>Pneu renforcé anti-crevaison</td><td>Carcasse rigide ou très protégée</td><td>0.91</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Les coefficients TPU ne sont pas dans les quatre choix SILCA originaux. Ils sont ajoutés comme approximation transparente à partir des tests Bicycle Rolling Resistance, Rene Herse/Bicycle Quarterly et AeroCoach rapporté par road.cc : TPU est meilleur que butyl, mais varie selon le modèle. Le TPU léger est proche de latex/tubeless, le TPU standard reste plus conservateur.</p>
+          <p>Sources : <a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance</a>, <a href="https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/" target="_blank" rel="noopener">Rene Herse / Bicycle Quarterly</a>, <a href="https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test" target="_blank" rel="noopener">road.cc / AeroCoach</a>.</p>
+        </details>
+
+        <details>
+          <summary>Pressions finales</summary>
+          <pre><code>P_avant_psi = CPP * C_vitesse * C_repartition_avant * C_type_pneu
+P_arriere_psi = CPP * C_vitesse * C_repartition_arriere * C_type_pneu
+P_bar = P_psi * 0.0689476</code></pre>
+          <p>Les PSI sont arrondis au 0.5 PSI. Les bar sont arrondis au 0.05 bar.</p>
+        </details>
+
+        <details>
+          <summary>Risque de pincement</summary>
+          <pre><code>v_ms = v_kmh / 3.6
+KE = 0.5 * masse_kg * v_ms^2
+RE = 0.5 * (0.8*w) * sqrt(K^2 - (0.8*w)^2)
+PF = 2*RE - KE</code></pre>
+          <p>Si <code>-500 <= PF <= 0</code>, le risque augmente. Si <code>PF < -500</code>, le risque est extrême. L’application affiche alors une largeur de pneu recommandée et des pressions alternatives non optimales.</p>
+        </details>
+
+        <details>
+          <summary>Limites et sécurité</summary>
+          <p>Ce calculateur donne une estimation de départ. Respectez toujours les pressions maximales indiquées par les fabricants de pneus et de jantes. Pour les montages hookless ou tubeless straight side, une pression élevée peut être dangereuse.</p>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <dialog class="dialog" id="riderDialog">
+    <form class="dialog-card" id="riderForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="section-kicker">Profil cycliste</p>
+          <h2 id="riderDialogTitle">Ajouter un cycliste</h2>
+        </div>
+        <button type="button" class="close-button" data-close-dialog="riderDialog" aria-label="Fermer">×</button>
+      </div>
+      <input type="hidden" id="riderId">
+      <label>Nom
+        <input id="riderName" type="text" autocomplete="name" required maxlength="40" placeholder="Ex. Julien">
+      </label>
+      <label>Poids cycliste en kg
+        <input id="riderWeight" type="number" inputmode="decimal" min="20" max="200" step="0.1" required placeholder="Ex. 72.5">
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="danger-button" id="deleteRiderButton">Supprimer</button>
+        <span></span>
+        <button type="button" class="ghost-button" data-close-dialog="riderDialog">Annuler</button>
+        <button type="submit" class="primary-button">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="bikeDialog">
+    <form class="dialog-card" id="bikeForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="section-kicker">Profil vélo</p>
+          <h2 id="bikeDialogTitle">Ajouter un vélo</h2>
+        </div>
+        <button type="button" class="close-button" data-close-dialog="bikeDialog" aria-label="Fermer">×</button>
+      </div>
+      <input type="hidden" id="bikeId">
+      <label>Nom du vélo
+        <input id="bikeName" type="text" required maxlength="40" placeholder="Ex. Gravel titane">
+      </label>
+      <label>Poids vélo + équipement en kg
+        <input id="bikeWeight" type="number" inputmode="decimal" min="3" max="60" step="0.1" required placeholder="Ex. 10.8">
+      </label>
+      <label>Largeur pneu mesurée en mm
+        <input id="bikeTireWidth" type="number" inputmode="numeric" min="20" max="65" step="1" required placeholder="Ex. 32">
+      </label>
+      <label>Diamètre de roue
+        <select id="bikeWheelDiameter" required></select>
+      </label>
+      <label>Répartition du poids
+        <select id="bikeWeightDistribution" required></select>
+      </label>
+      <label>Type de pneu
+        <select id="bikeTireType" required></select>
+      </label>
+      <p class="field-help">La carcasse est la structure du pneu. Choisissez “haut rendement” pour un pneu course très souple, “standard souple” pour un pneu route/gravel courant, et “renforcé” pour un pneu très protégé.</p>
+      <div class="dialog-actions">
+        <button type="button" class="danger-button" id="deleteBikeButton">Supprimer</button>
+        <span></span>
+        <button type="button" class="ghost-button" data-close-dialog="bikeDialog">Annuler</button>
+        <button type="submit" class="primary-button">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
