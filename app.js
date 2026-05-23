@@ -8,6 +8,8 @@
 
   const STORAGE_KEY = "jtirepresscalc:v1";
   const PSI_TO_BAR = 0.0689476;
+  const TEMP_PSI_PER_10C = 3;
+  const ALTITUDE_PSI_PER_1000M = 1.5;
 
   const SURFACES = [
     { id: "new-pavement", label: "Route neuve", detail: "Asphalte lisse · K1 261", k1: 261 },
@@ -59,6 +61,9 @@
     selectedBikeId: "",
     selectedSurface: "new-pavement",
     selectedRide: "moderate-group",
+    inflationTempC: 20,
+    rideTempC: 20,
+    altitudeDeltaM: 0,
   };
 
   const numberFormats = {
@@ -86,6 +91,9 @@
       surfaceGuideDialog: document.getElementById("surfaceGuideDialog"),
       surfaceGrid: document.getElementById("surfaceGrid"),
       rideGrid: document.getElementById("rideGrid"),
+      inflationTemp: document.getElementById("inflationTemp"),
+      rideTemp: document.getElementById("rideTemp"),
+      altitudeDelta: document.getElementById("altitudeDelta"),
       selectionSummary: document.getElementById("selectionSummary"),
       emptyState: document.getElementById("emptyState"),
       pressureResults: document.getElementById("pressureResults"),
@@ -141,8 +149,15 @@
     refs.resetButton.addEventListener("click", () => {
       state.selectedSurface = DEFAULT_STATE.selectedSurface;
       state.selectedRide = DEFAULT_STATE.selectedRide;
+      state.inflationTempC = DEFAULT_STATE.inflationTempC;
+      state.rideTempC = DEFAULT_STATE.rideTempC;
+      state.altitudeDeltaM = DEFAULT_STATE.altitudeDeltaM;
       persistAndRender();
     });
+
+    bindEnvironmentInput(refs.inflationTemp, "inflationTempC");
+    bindEnvironmentInput(refs.rideTemp, "rideTempC");
+    bindEnvironmentInput(refs.altitudeDelta, "altitudeDeltaM");
 
     refs.openSurfaceGuideButton.addEventListener("click", () => {
       showDialog(refs.surfaceGuideDialog);
@@ -170,6 +185,7 @@
   function renderAll() {
     normalizeState();
     renderProfileSelects();
+    renderEnvironmentControls();
     renderChoiceGrid(refs.surfaceGrid, SURFACES, state.selectedSurface, (id) => {
       state.selectedSurface = id;
       persistAndRender();
@@ -189,6 +205,21 @@
   function renderProfileSelects() {
     renderRiderSelect();
     renderBikeSelect();
+  }
+
+  function renderEnvironmentControls() {
+    refs.inflationTemp.value = state.inflationTempC;
+    refs.rideTemp.value = state.rideTempC;
+    refs.altitudeDelta.value = state.altitudeDeltaM;
+  }
+
+  function bindEnvironmentInput(input, stateKey) {
+    input.addEventListener("input", () => {
+      const value = parseNumericInput(input.value);
+      state[stateKey] = Number.isFinite(value) ? value : DEFAULT_STATE[stateKey];
+      saveState(state);
+      renderResult();
+    });
   }
 
   function renderRiderSelect() {
@@ -293,6 +324,7 @@
 
   function renderSelectionSummary(rider, bike, surface, ride) {
     const chips = [];
+    const environment = getEnvironmentCorrection();
     chips.push(rider ? `Cycliste: ${rider.name}` : "Cycliste à ajouter");
     chips.push(bike ? `Vélo: ${bike.name}` : "Vélo à ajouter");
 
@@ -304,6 +336,10 @@
 
     chips.push(surface.label);
     chips.push(ride.label);
+    if (environment.hasCorrection) {
+      chips.push(`ΔT ${formatSigned(environment.temperatureDeltaC)} °C`);
+      chips.push(`ΔAlt ${formatSigned(environment.altitudeDeltaM)} m`);
+    }
 
     refs.selectionSummary.replaceChildren(...chips.map((text) => {
       const chip = document.createElement("span");
@@ -338,6 +374,15 @@
         type: "warning",
         title: "Alerte hookless.",
         text: "Si vous utilisez des jantes hookless ou tubeless straight side, vérifiez impérativement la limite fabricant. SILCA signale une attention au-delà de 70 PSI.",
+      });
+    }
+
+    if (result.environment?.hasCorrection) {
+      const direction = result.environment.correctionPsi > 0 ? "retirée" : "ajoutée";
+      alerts.push({
+        type: "info",
+        title: "Correction conditions appliquée.",
+        text: `${formatPsi(Math.abs(roundTo(result.environment.correctionPsi, 0.5)))} PSI ${direction} pour tenir compte de ΔT ${formatSigned(result.environment.temperatureDeltaC)} °C et ΔAlt ${formatSigned(result.environment.altitudeDeltaM)} m. Les valeurs affichées sont celles à régler au gonflage; cible en conditions de roulage: ${formatPsi(result.targetFrontPsi)} PSI avant et ${formatPsi(result.targetRearPsi)} PSI arrière.`,
       });
     }
 
@@ -388,14 +433,25 @@
     const speedCoefficient = 0.97 + ((ride.speedMph - 10) * 0.06 / 23);
     const distribution = findById(WEIGHT_DISTRIBUTIONS, bike.weightDistribution) || WEIGHT_DISTRIBUTIONS[1];
     const tireType = findById(TIRE_TYPES, bike.tireType) || TIRE_TYPES[0];
+    const environment = getEnvironmentCorrection();
 
-    const rawFrontPsi = cpp * speedCoefficient * distribution.front * tireType.front;
-    const rawRearPsi = cpp * speedCoefficient * distribution.rear * tireType.rear;
+    const targetRawFrontPsi = cpp * speedCoefficient * distribution.front * tireType.front;
+    const targetRawRearPsi = cpp * speedCoefficient * distribution.rear * tireType.rear;
+    const rawFrontPsi = Math.max(0, targetRawFrontPsi - environment.correctionPsi);
+    const rawRearPsi = Math.max(0, targetRawRearPsi - environment.correctionPsi);
     const frontPsi = roundTo(rawFrontPsi, 0.5);
     const rearPsi = roundTo(rawRearPsi, 0.5);
     const frontBar = roundTo(rawFrontPsi * PSI_TO_BAR, 0.05);
     const rearBar = roundTo(rawRearPsi * PSI_TO_BAR, 0.05);
-    const pinchFlat = calculatePinchFlat({ massKg, speedMph: ride.speedMph, width, k, rawFrontPsi, rawRearPsi });
+    const targetFrontPsi = roundTo(targetRawFrontPsi, 0.5);
+    const targetRearPsi = roundTo(targetRawRearPsi, 0.5);
+    const pinchFlat = calculatePinchFlat({ massKg, speedMph: ride.speedMph, width, k, rawFrontPsi: targetRawFrontPsi, rawRearPsi: targetRawRearPsi });
+    if (pinchFlat.frontAlternativePsi !== undefined) {
+      pinchFlat.targetFrontAlternativePsi = pinchFlat.frontAlternativePsi;
+      pinchFlat.targetRearAlternativePsi = pinchFlat.rearAlternativePsi;
+      pinchFlat.frontAlternativePsi = roundTo(Math.max(0, pinchFlat.frontAlternativePsi - environment.correctionPsi), 0.5);
+      pinchFlat.rearAlternativePsi = roundTo(Math.max(0, pinchFlat.rearAlternativePsi - environment.correctionPsi), 0.5);
+    }
 
     return {
       rider,
@@ -406,14 +462,40 @@
       k,
       cpp,
       tireType,
+      environment,
       frontPsi,
       rearPsi,
       frontBar,
       rearBar,
       rawFrontPsi,
       rawRearPsi,
-      hooklessWarning: frontPsi > 70 || rearPsi > 70,
+      targetFrontPsi,
+      targetRearPsi,
+      targetRawFrontPsi,
+      targetRawRearPsi,
+      hooklessWarning: Math.max(frontPsi, rearPsi, targetFrontPsi, targetRearPsi) > 70,
       ...pinchFlat,
+    };
+  }
+
+  function getEnvironmentCorrection() {
+    const inflationTempC = safeNumber(state.inflationTempC, DEFAULT_STATE.inflationTempC);
+    const rideTempC = safeNumber(state.rideTempC, DEFAULT_STATE.rideTempC);
+    const altitudeDeltaM = safeNumber(state.altitudeDeltaM, DEFAULT_STATE.altitudeDeltaM);
+    const temperatureDeltaC = rideTempC - inflationTempC;
+    const temperaturePsi = (temperatureDeltaC / 10) * TEMP_PSI_PER_10C;
+    const altitudePsi = (altitudeDeltaM / 1000) * ALTITUDE_PSI_PER_1000M;
+    const correctionPsi = temperaturePsi + altitudePsi;
+
+    return {
+      inflationTempC,
+      rideTempC,
+      altitudeDeltaM,
+      temperatureDeltaC,
+      temperaturePsi,
+      altitudePsi,
+      correctionPsi,
+      hasCorrection: Math.abs(correctionPsi) >= 0.25,
     };
   }
 
@@ -589,14 +671,18 @@
       `Arrière: ${formatBar(lastResult.rearBar)} bar (${formatPsi(lastResult.rearPsi)} PSI)`,
     ].join("\n");
 
+    const conditionText = lastResult.environment?.hasCorrection
+      ? `\nCorrection conditions: ${formatSigned(-lastResult.environment.correctionPsi)} PSI à régler vs cible de roulage (${formatSigned(lastResult.environment.temperatureDeltaC)} °C, ${formatSigned(lastResult.environment.altitudeDeltaM)} m)`
+      : "";
+
     if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).then(() => {
+      navigator.clipboard.writeText(`${text}${conditionText}`).then(() => {
         flashCopyButton("Copié");
-      }).catch(() => fallbackCopy(text));
+      }).catch(() => fallbackCopy(`${text}${conditionText}`));
       return;
     }
 
-    fallbackCopy(text);
+    fallbackCopy(`${text}${conditionText}`);
   }
 
   function fallbackCopy(text) {
@@ -663,6 +749,9 @@
       selectedBikeId: typeof candidate.selectedBikeId === "string" ? candidate.selectedBikeId : "",
       selectedSurface: typeof candidate.selectedSurface === "string" ? candidate.selectedSurface : DEFAULT_STATE.selectedSurface,
       selectedRide: typeof candidate.selectedRide === "string" ? candidate.selectedRide : DEFAULT_STATE.selectedRide,
+      inflationTempC: safeNumber(candidate.inflationTempC, DEFAULT_STATE.inflationTempC),
+      rideTempC: safeNumber(candidate.rideTempC, DEFAULT_STATE.rideTempC),
+      altitudeDeltaM: safeNumber(candidate.altitudeDeltaM, DEFAULT_STATE.altitudeDeltaM),
     };
   }
 
@@ -749,6 +838,11 @@
     return Number(String(value).replace(",", "."));
   }
 
+  function safeNumber(value, fallback) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : fallback;
+  }
+
   function roundTo(value, step) {
     return Math.round(value / step) * step;
   }
@@ -771,6 +865,11 @@
 
   function formatOne(value) {
     return numberFormats.one.format(value);
+  }
+
+  function formatSigned(value) {
+    const rounded = Math.round(value * 10) / 10;
+    return `${rounded > 0 ? "+" : ""}${formatOne(rounded)}`;
   }
 
   function showDialog(dialog) {

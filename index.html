@@ -75,6 +75,27 @@
           </div>
           <div class="choice-grid ride-grid" id="rideGrid" role="list"></div>
         </article>
+
+        <article class="panel">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="section-kicker">Conditions</p>
+              <h2>Température et altitude</h2>
+            </div>
+          </div>
+          <div class="condition-grid">
+            <label>Température au gonflage °C
+              <input id="inflationTemp" type="number" inputmode="decimal" min="-20" max="60" step="1">
+            </label>
+            <label>Température de sortie °C
+              <input id="rideTemp" type="number" inputmode="decimal" min="-20" max="60" step="1">
+            </label>
+            <label>Écart altitude sortie - gonflage, m
+              <input id="altitudeDelta" type="number" inputmode="numeric" min="-2000" max="4000" step="50">
+            </label>
+          </div>
+          <p class="field-help">Optionnel. Plus chaud ou plus haut que le lieu de gonflage : on règle un peu moins. Plus froid ou plus bas : on règle un peu plus.</p>
+        </article>
       </section>
 
       <aside class="result-panel" aria-live="polite">
@@ -170,6 +191,16 @@ CPP = num / denom</code></pre>
         </details>
 
         <details>
+          <summary>Correction température et altitude</summary>
+          <p>SILCA ne fournit pas de champ dédié dans son calculateur public. L’application ajoute une correction séparée pour convertir la cible de roulage en pression à régler au moment du gonflage.</p>
+          <pre><code>delta_temperature_psi = ((temperature_sortie - temperature_gonflage) / 10) * 3
+delta_altitude_psi = (altitude_sortie - altitude_gonflage) / 1000 * 1.5
+pression_a_regler = pression_cible_roulage - delta_temperature_psi - delta_altitude_psi</code></pre>
+          <p>Exemple : si la sortie est 10 °C plus chaude, la pression montera en roulant, donc l’application retire environ 3 PSI au gonflage. Si la sortie est 1000 m plus haute, la pression relative augmente avec la baisse de pression atmosphérique, donc l’application retire environ 1,5 PSI.</p>
+          <p>Contrôle des sources : Rene Herse souligne que la température ambiante est une variable majeure des tests pneus ; Josh Poertner/SILCA et TRS expliquent pourquoi les conditions réelles et l’impédance de surface dominent le choix de pression ; Pirelli rappelle qu’un outil de pression reste une recommandation à affiner ; PsiCling documente l’ordre de grandeur de la loi de Gay-Lussac ; Engineering Toolbox donne la formule atmosphérique standard utilisée pour justifier l’ordre de grandeur altitude.</p>
+        </details>
+
+        <details>
           <summary>Répartition du poids et type de pneu</summary>
           <p>La carcasse du pneu, souvent appelée <code>casing</code> en anglais, est la structure textile sous la bande de roulement. Une carcasse souple se déforme avec moins de pertes, alors qu’un pneu renforcé ou très rigide demande généralement une pression optimale plus basse.</p>
           <div class="table-wrap">
@@ -225,6 +256,21 @@ PF = 2*RE - KE</code></pre>
         <details>
           <summary>Limites et sécurité</summary>
           <p>Ce calculateur donne une estimation de départ. Respectez toujours les pressions maximales indiquées par les fabricants de pneus et de jantes. Pour les montages hookless ou tubeless straight side, une pression élevée peut être dangereuse. Avec une chambre TPU, montez soigneusement la chambre, ne la gonflez pas fortement hors du pneu, évitez de réutiliser une chambre déjà étirée dans un pneu plus étroit, et soyez prudent avec les versions ultralight sur jantes à freins à patins en montagne.</p>
+        </details>
+
+        <details>
+          <summary>Sources citées</summary>
+          <ul class="source-list">
+            <li><a href="https://www.renehersecycles.com/tires-and-pressure-new-research-and-what-it-means/" target="_blank" rel="noopener">Rene Herse Cycles, Tires and Pressure: new research and what it means</a></li>
+            <li><a href="https://trstriathlon.com/talking-tires-with-joshua-poertner/" target="_blank" rel="noopener">TRS Triathlon, Talking tires with Joshua Poertner</a></li>
+            <li><a href="https://silca.cc/blogs/silca/part-4a-rolling-resistance-the-history-and-previous-works" target="_blank" rel="noopener">SILCA, Rolling Resistance: The History and Previous Works</a></li>
+            <li><a href="https://www.pirelli.com/tyres/en-gb/bike/pressure-tool" target="_blank" rel="noopener">Pirelli Pressure Tool</a></li>
+            <li><a href="https://psicling.com/en/" target="_blank" rel="noopener">PsiCling, température et loi de Gay-Lussac</a></li>
+            <li><a href="https://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html" target="_blank" rel="noopener">Engineering Toolbox, Atmospheric Pressure vs. Elevation</a></li>
+            <li><a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance, Tubolito Inner Tube Tests</a></li>
+            <li><a href="https://www.renehersecycles.com/tpu-tubes-how-fast-are-they/" target="_blank" rel="noopener">Rene Herse / Bicycle Quarterly, TPU Tubes: How fast are they?</a></li>
+            <li><a href="https://road.cc/content/tech-news/265627-use-latex-inner-tubes-lowest-rolling-resistance-says-aerocoach-test" target="_blank" rel="noopener">road.cc / AeroCoach, latex, TPU et butyl</a></li>
+          </ul>
         </details>
       </div>
     </section>

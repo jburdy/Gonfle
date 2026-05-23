@@ -329,6 +329,12 @@ button.guide-link {
   margin-top: 18px;
 }
 
+.condition-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .field-block {
   display: grid;
   gap: 8px;
@@ -654,6 +660,15 @@ details p {
   line-height: 1.62;
 }
 
+.source-list {
+  display: grid;
+  gap: 10px;
+  margin: 0 18px 18px;
+  padding-left: 20px;
+  color: var(--muted-strong);
+  line-height: 1.5;
+}
+
 details a {
   color: #9ee7ff;
   text-decoration-thickness: 0.08em;
@@ -754,7 +769,8 @@ details a {
   }
 
   .choice-grid,
-  .ride-grid {
+  .ride-grid,
+  .condition-grid {
     grid-template-columns: 1fr;
   }
 
