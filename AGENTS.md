@@ -1,15 +1,16 @@
 # Consignes Agents
 
-Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté navigateur, sans backend ni dépendances de build.
+Ce projet est un calculateur statique de pression pneus vélo nommé **"Gonflé"**. Il tourne côté navigateur, sans backend ni dépendances de build.
+Le répertoire racine du site web (wwwRoot) est situé dans le dossier `/docs` en raison des restrictions de GitHub Pages (l'application y est servie).
 
 ## Structure
 
-- `index.html` : interface, textes visibles, panneaux d’explication et dialogues profils.
-- `app.js` : état local, calculs, rendu dynamique, alertes et copie des pressions.
-- `styles.css` : design responsive sombre, composants et mise en page.
+- `docs/index.html` : interface, textes visibles, panneaux d’explication et dialogues profils.
+- `docs/app.js` : état local, calculs, rendu dynamique, alertes et copie des pressions.
+- `docs/styles.css` : design responsive sombre, composants et mise en page.
 - `sources/silca-tire-pressure-formulas.md` : référence technique du modèle de calcul.
 - `sources/Rapport-impacte-TPU.md` : justification locale des choix liés aux chambres TPU.
-- `assets/surface-conditions.webp` : guide visuel des surfaces.
+- `docs/assets/surface-conditions.webp` : guide visuel des surfaces.
 
 ## Invariants
 
@@ -23,7 +24,7 @@ Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté 
 
 ## Calcul
 
-- Modifier les formules dans `app.js` et mettre à jour `sources/silca-tire-pressure-formulas.md` dans le même changement.
+- Modifier les formules dans `docs/app.js` et mettre à jour `sources/silca-tire-pressure-formulas.md` dans le même changement.
 - Conserver les coefficients SILCA documentés sauf demande explicite.
 - Toute hypothèse ajoutée, notamment TPU, doit être courte, visible dans la doc et cohérente avec `sources/Rapport-impacte-TPU.md`.
 - Ne pas masquer les alertes de sécurité : hookless, pincement, TPU et limites pneus/jantes.
@@ -31,6 +32,7 @@ Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté 
 ## Interface Et Textes
 
 - Écrire en français, de façon concise et directe.
+- Ne pas changer les textes et libellés sans me demander (validation explicite requise).
 - Éviter les paragraphes longs dans l’interface. Préférer une phrase utile à deux phrases explicatives.
 - Garder les libellés mobiles courts. Tester mentalement sur écran étroit avant d’allonger un texte.
 - Pour `Répartition du poids`, rappeler que le choix décrit la charge avant/arrière, pas un poids à saisir.
@@ -46,10 +48,10 @@ Ce projet est un calculateur statique de pression pneus vélo. Il tourne côté 
 
 ## Vérifications
 
-- Vérifier la syntaxe JavaScript avec `node --check app.js`.
+- Vérifier la syntaxe JavaScript avec `node --check docs/app.js`.
 - Vérifier les espaces et conflits simples avec `git diff --check`.
 - Rechercher les termes supprimés quand un concept disparaît, par exemple `altitude`.
-- Pour une modification UI, ouvrir `index.html` dans un navigateur et contrôler desktop + mobile si possible.
+- Pour une modification UI, ouvrir `docs/index.html` dans un navigateur et contrôler desktop + mobile si possible.
 - S’il n’existe pas de suite de tests, le dire clairement dans le résumé final.
 
 ## Git

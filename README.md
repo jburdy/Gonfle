@@ -44,4 +44,4 @@ Les formules et coefficients de Gonflé s'appuient sur des recherches et publica
 
 ## Utilisation locale
 
-Ouvrez simplement [index.html](index.html) dans n'importe quel navigateur moderne. Aucun serveur ni build n'est nécessaire.
+Ouvrez simplement [index.html](docs/index.html) dans n'importe quel navigateur moderne. Aucun serveur ni build n'est nécessaire.
