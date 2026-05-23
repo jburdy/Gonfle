@@ -82,6 +82,8 @@
       addBikeButton: document.getElementById("addBikeButton"),
       editBikeButton: document.getElementById("editBikeButton"),
       resetButton: document.getElementById("resetButton"),
+      openSurfaceGuideButton: document.getElementById("openSurfaceGuideButton"),
+      surfaceGuideDialog: document.getElementById("surfaceGuideDialog"),
       surfaceGrid: document.getElementById("surfaceGrid"),
       rideGrid: document.getElementById("rideGrid"),
       selectionSummary: document.getElementById("selectionSummary"),
@@ -140,6 +142,10 @@
       state.selectedSurface = DEFAULT_STATE.selectedSurface;
       state.selectedRide = DEFAULT_STATE.selectedRide;
       persistAndRender();
+    });
+
+    refs.openSurfaceGuideButton.addEventListener("click", () => {
+      showDialog(refs.surfaceGuideDialog);
     });
 
     refs.copyButton.addEventListener("click", copyPressures);

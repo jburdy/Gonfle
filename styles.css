@@ -310,6 +310,12 @@ code {
   font-weight: 900;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.guide-link {
+  appearance: none;
 }
 
 .guide-link:hover {
@@ -662,6 +668,22 @@ details a {
   padding: 0;
   color: var(--text);
   background: transparent;
+}
+
+.guide-dialog {
+  width: min(920px, calc(100% - 24px));
+}
+
+.guide-dialog-card {
+  gap: 12px;
+}
+
+.guide-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
 }
 
 .dialog::backdrop {

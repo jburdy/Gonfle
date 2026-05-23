@@ -61,7 +61,7 @@
               <p class="section-kicker">Terrain</p>
               <h2>Surface de roulage</h2>
             </div>
-            <a class="guide-link" href="assets/surface-conditions.webp" target="_blank" rel="noopener">Ouvrir le guide visuel</a>
+            <button class="guide-link" type="button" id="openSurfaceGuideButton">Ouvrir le guide visuel</button>
           </div>
           <div class="choice-grid surface-grid" id="surfaceGrid" role="list"></div>
         </article>
@@ -290,6 +290,26 @@ PF = 2*RE - KE</code></pre>
         <button type="submit" class="primary-button">Enregistrer</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog class="dialog guide-dialog" id="surfaceGuideDialog">
+    <div class="dialog-card guide-dialog-card">
+      <div class="dialog-heading">
+        <div>
+          <p class="section-kicker">Terrain</p>
+          <h2>Guide des surfaces</h2>
+        </div>
+        <button type="button" class="close-button" data-close-dialog="surfaceGuideDialog" aria-label="Fermer">×</button>
+      </div>
+      <img
+        class="guide-image"
+        src="assets/surface-conditions.webp"
+        alt="Guide visuel des conditions de surface pour choisir le terrain"
+        width="1600"
+        height="900"
+        decoding="async"
+      >
+    </div>
   </dialog>
 </body>
 </html>
