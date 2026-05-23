@@ -142,7 +142,7 @@
 
     <section class="formula-section" aria-label="Explication transparente des calculs">
       <div class="formula-intro">
-        <p class="section-kicker">Transparence</p>
+        <p class="section-kicker">Explications</p>
         <h2>Formules</h2>
         <p>Les calculs se font dans le navigateur. Les profils restent en stockage local.</p>
       </div>
@@ -150,153 +150,161 @@
       <div class="details-grid">
         <details open>
           <summary>Pression de base (Modèle SILCA)</summary>
-          <p>La pression théorique de départ (CPP) est calculée en fonction de la charge totale, du diamètre de roue et de la rugosité de la surface (<var>K</var>) :</p>
-          <div class="math-block">
-            <div class="math-expr">
-              <var>K</var> = 0.5 × (<var>Poids<sub>total_kg</sub></var> − 50) + <var>K₁</var>
-            </div>
-            <div class="math-expr">
-              <var>Numérateur</var> = (−0.00006<var>w</var>³ + 0.0079<var>w</var>² − 0.4102<var>w</var> + 12.725) × −226.44
-            </div>
-            <div class="math-expr">
-              <var>Dénominateur</var> =
-              <span class="math-bracket">[</span>
-              <div class="math-fraction">
-                <span class="math-numerator">−0.5 × 9.81</span>
-                <span class="math-denominator">
-                  <var>K</var> ×
-                  <div class="math-fraction inline-frac">
-                    <span class="math-numerator">20</span>
-                    <span class="math-denominator"><var>w</var></span>
-                  </div>
-                </span>
+          <div class="details-body">
+            <p>La pression théorique de départ (CPP) est calculée en fonction de la charge totale, du diamètre de roue et de la rugosité de la surface (<var>K</var>) :</p>
+            <div class="math-block">
+              <div class="math-expr">
+                <var>K</var> = 0.5 × (<var>Poids<sub>total_kg</sub></var> − 50) + <var>K₁</var>
               </div>
-              + <var>w</var> +
-              <div class="math-fraction inline-frac">
-                <span class="math-numerator"><var>d</var></span>
-                <span class="math-denominator">2</span>
+              <div class="math-expr">
+                <var>Numérateur</var> = (−0.00006<var>w</var>³ + 0.0079<var>w</var>² − 0.4102<var>w</var> + 12.725) × −226.44
               </div>
-              <span class="math-bracket">]</span>²
-              −
-              <span class="math-bracket">(</span>
-              <var>w</var> +
-              <div class="math-fraction inline-frac">
-                <span class="math-numerator"><var>d</var></span>
-                <span class="math-denominator">2</span>
+              <div class="math-expr">
+                <var>Dénominateur</var> =
+                <span class="math-bracket">[</span>
+                <div class="math-fraction">
+                  <span class="math-numerator">−0.5 × 9.81</span>
+                  <span class="math-denominator">
+                    <var>K</var> ×
+                    <div class="math-fraction inline-frac">
+                      <span class="math-numerator">20</span>
+                      <span class="math-denominator"><var>w</var></span>
+                    </div>
+                  </span>
+                </div>
+                + <var>w</var> +
+                <div class="math-fraction inline-frac">
+                  <span class="math-numerator"><var>d</var></span>
+                  <span class="math-denominator">2</span>
+                </div>
+                <span class="math-bracket">]</span>²
+                −
+                <span class="math-bracket">(</span>
+                <var>w</var> +
+                <div class="math-fraction inline-frac">
+                  <span class="math-numerator"><var>d</var></span>
+                  <span class="math-denominator">2</span>
+                </div>
+                <span class="math-bracket">)</span>²
               </div>
-              <span class="math-bracket">)</span>²
+              <div class="math-expr">
+                <var>CPP</var> =
+                <div class="math-fraction">
+                  <span class="math-numerator"><var>Numérateur</var></span>
+                  <span class="math-denominator"><var>Dénominateur</var></span>
+                </div>
+              </div>
             </div>
-            <div class="math-expr">
-              <var>CPP</var> =
-              <div class="math-fraction">
-                <span class="math-numerator"><var>Numérateur</var></span>
-                <span class="math-denominator"><var>Dénominateur</var></span>
-              </div>
+            <p class="field-help">Avec <var>w</var> = largeur de pneu mesurée (mm), <var>d</var> = diamètre BSD (mm), et <var>K₁</var> le coefficient de surface.</p>
+            <div class="cpp-explanation">
+              <p><strong>Pourquoi cette formule ?</strong> Il s'agit du modèle de calcul développé par SILCA pour estimer le point de pression optimal :</p>
+              <ul>
+                <li><strong>Le Numérateur</strong> modélise la tension de carcasse idéale en fonction de sa largeur réelle <var>w</var> afin de réduire la résistance au roulement interne (hystérèse).</li>
+                <li><strong>Le Dénominateur</strong> évalue la déformation (l'affaissement) du pneu sous charge. Il combine la géométrie de la jante (<var>w</var> et diamètre <var>d</var>), la charge supportée et la rugosité de la chaussée <var>K</var>.</li>
+              </ul>
             </div>
-          </div>
-          <p class="field-help">Avec <var>w</var> = largeur de pneu mesurée (mm), <var>d</var> = diamètre BSD (mm), et <var>K₁</var> le coefficient de surface.</p>
-          <div class="cpp-explanation">
-            <p><strong>Pourquoi cette formule ?</strong> Il s'agit du modèle de calcul développé par SILCA pour estimer le point de pression optimal :</p>
-            <ul>
-              <li><strong>Le Numérateur</strong> modélise la tension de carcasse idéale en fonction de sa largeur réelle <var>w</var> afin de réduire la résistance au roulement interne (hystérèse).</li>
-              <li><strong>Le Dénominateur</strong> évalue la déformation (l'affaissement) du pneu sous charge. Il combine la géométrie de la jante (<var>w</var> et diamètre <var>d</var>), la charge supportée et la rugosité de la chaussée <var>K</var>.</li>
-            </ul>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Surface</th><th>K1</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Route neuve</td><td>261</td></tr>
-                <tr><td>Route usée</td><td>246.5</td></tr>
-                <tr><td>Gravel Cat. 1</td><td>235.5</td></tr>
-                <tr><td>Chipseal (rugueux)</td><td>225</td></tr>
-                <tr><td>Gravel Cat. 2</td><td>212.5</td></tr>
-                <tr><td>Pavés</td><td>199</td></tr>
-                <tr><td>Gravel Cat. 3</td><td>187</td></tr>
-                <tr><td>Gravel Cat. 4</td><td>170</td></tr>
-              </tbody>
-            </table>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Surface</th><th>K1</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Route neuve</td><td>261</td></tr>
+                  <tr><td>Route usée</td><td>246.5</td></tr>
+                  <tr><td>Gravel Cat. 1</td><td>235.5</td></tr>
+                  <tr><td>Chipseal (rugueux)</td><td>225</td></tr>
+                  <tr><td>Gravel Cat. 2</td><td>212.5</td></tr>
+                  <tr><td>Pavés</td><td>199</td></tr>
+                  <tr><td>Gravel Cat. 3</td><td>187</td></tr>
+                  <tr><td>Gravel Cat. 4</td><td>170</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </details>
 
         <details>
           <summary>Ajustements de roulage (Pneus, Vitesse & Météo)</summary>
-          <p>La pression cible est ensuite modulée selon les coefficients de vitesse, de répartition de charge et de carcasse :</p>
-          <div class="math-block">
-            <div class="math-expr">
-              <var>P<sub>cible</sub></var> = <var>CPP</var> × <var>C<sub>vitesse</sub></var> × <var>C<sub>répartition</sub></var> × <var>C<sub>pneu</sub></var>
-            </div>
-            <div class="math-expr">
-              <var>C<sub>vitesse</sub></var> = 0.97 +
-              <div class="math-fraction">
-                <span class="math-numerator">(<var>v<sub>mph</sub></var> − 10) × 0.06</span>
-                <span class="math-denominator">23</span>
+          <div class="details-body">
+            <p>La pression cible est ensuite modulée selon les coefficients de vitesse, de répartition de charge et de carcasse :</p>
+            <div class="math-block">
+              <div class="math-expr">
+                <var>P<sub>cible</sub></var> = <var>CPP</var> × <var>C<sub>vitesse</sub></var> × <var>C<sub>répartition</sub></var> × <var>C<sub>pneu</sub></var>
+              </div>
+              <div class="math-expr">
+                <var>C<sub>vitesse</sub></var> = 0.97 +
+                <div class="math-fraction">
+                  <span class="math-numerator">(<var>v<sub>mph</sub></var> − 10) × 0.06</span>
+                  <span class="math-denominator">23</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Répartition</th><th>Avant</th><th>Arrière</th><th>Type de pneu</th><th>Coeff.</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>50/50 CLM / Piste</td><td>1.0</td><td>1.0</td><td>Haut rendement (Tubeless/Latex)</td><td>1.0</td></tr>
-                <tr><td>48/52 Route</td><td>0.985</td><td>1.01</td><td>Haut rendement (TPU léger) <span class="secondary-pressure">−10%</span></td><td>0.90</td></tr>
-                <tr><td>47/53 Gravel</td><td>0.975</td><td>1.02</td><td>Standard souple (Tubeless/Latex)</td><td>0.97</td></tr>
-                <tr><td>46.5/53.5 VTT</td><td>0.97</td><td>1.03</td><td>Standard souple (TPU) <span class="secondary-pressure">−10%</span></td><td>0.873</td></tr>
-                <tr><td colspan="3"></td><td>Standard (Butyl classique)</td><td>0.94</td></tr>
-                <tr><td colspan="3"></td><td>Renforcé anti-crevaison</td><td>0.91</td></tr>
-              </tbody>
-            </table>
-          </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Répartition</th><th>Avant</th><th>Arrière</th><th>Type de pneu</th><th>Coeff.</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>50/50 CLM / Piste</td><td>1.0</td><td>1.0</td><td>Haut rendement (Tubeless/Latex)</td><td>1.0</td></tr>
+                  <tr><td>48/52 Route</td><td>0.985</td><td>1.01</td><td>Haut rendement (TPU léger) <span class="secondary-pressure">−10%</span></td><td>0.90</td></tr>
+                  <tr><td>47/53 Gravel</td><td>0.975</td><td>1.02</td><td>Standard souple (Tubeless/Latex)</td><td>0.97</td></tr>
+                  <tr><td>46.5/53.5 VTT</td><td>0.97</td><td>1.03</td><td>Standard souple (TPU) <span class="secondary-pressure">−10%</span></td><td>0.873</td></tr>
+                  <tr><td colspan="3"></td><td>Standard (Butyl classique)</td><td>0.94</td></tr>
+                  <tr><td colspan="3"></td><td>Renforcé anti-crevaison</td><td>0.91</td></tr>
+                </tbody>
+              </table>
+            </div>
 
-          <p><strong>Correction Température :</strong> La pression recommandée s'adapte à l'écart de température entre le gonflage et la sortie :</p>
-          <div class="math-block">
-            <div class="math-expr">
-              <var>ΔP<sub>temp</sub></var> =
-              <div class="math-fraction">
-                <span class="math-numerator">(<var>T<sub>sortie</sub></var> − <var>T<sub>gonflage</sub></var>) × 3</span>
-                <span class="math-denominator">10</span>
+            <p><strong>Correction Température :</strong> La pression recommandée s'adapte à l'écart de température entre le gonflage et la sortie :</p>
+            <div class="math-block">
+              <div class="math-expr">
+                <var>ΔP<sub>temp</sub></var> =
+                <div class="math-fraction">
+                  <span class="math-numerator">(<var>T<sub>sortie</sub></var> − <var>T<sub>gonflage</sub></var>) × 3</span>
+                  <span class="math-denominator">10</span>
+                </div>
+                PSI
               </div>
-              PSI
+              <div class="math-expr">
+                <var>P<sub>recommandée</sub></var> = <var>P<sub>cible</sub></var> − <var>ΔP<sub>temp</sub></var>
+              </div>
             </div>
-            <div class="math-expr">
-              <var>P<sub>recommandée</sub></var> = <var>P<sub>cible</sub></var> − <var>ΔP<sub>temp</sub></var>
-            </div>
+            <p class="field-help"><strong>Exemple pratique en Suisse romande :</strong> Vous préparez votre vélo à la cave à Lausanne à 14 °C, mais roulez l'après-midi au soleil en Valais ou au bord du lac Léman à 24 °C. L'air se dilatant avec la hausse de $+10$ °C, la formule retranche 3 PSI (environ 0.2 bar) au gonflage pour atteindre la pression idéale sur la route.</p>
           </div>
-          <p class="field-help"><strong>Exemple pratique en Suisse romande :</strong> Vous préparez votre vélo à la cave à Lausanne à 14 °C, mais roulez l'après-midi au soleil en Valais ou au bord du lac Léman à 24 °C. L'air se dilatant avec la hausse de $+10$ °C, la formule retranche 3 PSI (environ 0.2 bar) au gonflage pour atteindre la pression idéale sur la route.</p>
         </details>
 
         <details>
           <summary>Sécurité & Limites (Pincement & Hookless)</summary>
-          <p><strong>Risque de pincement (Pinch Flat) :</strong> L'application compare l'énergie cinétique du choc avec l'énergie de déformation du pneu :</p>
-          <div class="math-block">
-            <div class="math-expr">
-              <var>KE</var> = 0.5 × <var>m<sub>total</sub></var> × <var>v<sub>m/s</sub></var>²
+          <div class="details-body">
+            <p><strong>Risque de pincement (Pinch Flat) :</strong> L'application compare l'énergie cinétique du choc avec l'énergie de déformation du pneu :</p>
+            <div class="math-block">
+              <div class="math-expr">
+                <var>KE</var> = 0.5 × <var>m<sub>total</sub></var> × <var>v<sub>m/s</sub></var>²
+              </div>
+              <div class="math-expr">
+                <var>RE</var> = 0.5 × (0.8<var>w</var>) × <span class="math-sqrt">√</span><span class="math-sqrt-content"><var>K</var>² − (0.8<var>w</var>)²</span>
+              </div>
+              <div class="math-expr">
+                <var>PF</var> = 2 × <var>RE</var> − <var>KE</var>
+              </div>
             </div>
-            <div class="math-expr">
-              <var>RE</var> = 0.5 × (0.8<var>w</var>) × <span class="math-sqrt">√</span><span class="math-sqrt-content"><var>K</var>² − (0.8<var>w</var>)²</span>
-            </div>
-            <div class="math-expr">
-              <var>PF</var> = 2 × <var>RE</var> − <var>KE</var>
-            </div>
-          </div>
-          <p class="field-help">Si <var>PF</var> est négatif, un risque de pincement est identifié. L'application propose alors une largeur recommandée minimale et des pressions de secours.</p>
+            <p class="field-help">Si <var>PF</var> est négatif, un risque de pincement est identifié. L'application propose alors une largeur recommandée minimale et des pressions de secours.</p>
 
-          <p><strong>Limites Hookless (jantes sans crochets) :</strong> La pression maximale recommandée est bridée à <strong>70 PSI (4.8 bar)</strong> par mesure de précaution (selon l'ISO 5775) pour prévenir tout risque de déjantage accidentel.</p>
+            <p><strong>Limites Hookless (jantes sans crochets) :</strong> La pression maximale recommandée est bridée à <strong>70 PSI (4.8 bar)</strong> par mesure de précaution (selon l'ISO 5775) pour prévenir tout risque de déjantage accidentel.</p>
+          </div>
         </details>
 
         <details>
           <summary>Sources scientifiques citées</summary>
-          <p>Les modèles physiques et les ajustements s'appuient sur les publications suivantes :</p>
-          <ul class="source-list">
-            <li><a href="https://www.renehersecycles.com/tires-and-pressure-new-research-and-what-it-means/" target="_blank" rel="noopener">Rene Herse Cycles</a> — Recherche sur la pression et l'impédance de roulement.</li>
-            <li><a href="https://silca.cc/blogs/silca/part-4a-rolling-resistance-the-history-and-previous-works" target="_blank" rel="noopener">SILCA</a> — Pression critique et pertes par hystérèse / vibrations.</li>
-            <li><a href="https://psicling.com/en/" target="_blank" rel="noopener">PsiCling</a> — Physique et thermodynamique des pneumatiques.</li>
-            <li><a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance</a> — Tests et rendement des chambres TPU.</li>
-          </ul>
+          <div class="details-body">
+            <p>Les modèles physiques et les ajustements s'appuient sur les publications suivantes :</p>
+            <ul class="source-list">
+              <li><a href="https://www.renehersecycles.com/tires-and-pressure-new-research-and-what-it-means/" target="_blank" rel="noopener">Rene Herse Cycles</a> — Recherche sur la pression et l'impédance de roulement.</li>
+              <li><a href="https://silca.cc/blogs/silca/part-4a-rolling-resistance-the-history-and-previous-works" target="_blank" rel="noopener">SILCA</a> — Pression critique et pertes par hystérèse / vibrations.</li>
+              <li><a href="https://psicling.com/en/" target="_blank" rel="noopener">PsiCling</a> — Physique et thermodynamique des pneumatiques.</li>
+              <li><a href="https://www.bicyclerollingresistance.com/specials/tubolito" target="_blank" rel="noopener">Bicycle Rolling Resistance</a> — Tests et rendement des chambres TPU.</li>
+            </ul>
+          </div>
         </details>
       </div>
     </section>
@@ -313,10 +321,10 @@
       </div>
       <input type="hidden" id="riderId">
       <label>Nom
-        <input id="riderName" type="text" autocomplete="name" required maxlength="40" placeholder="Ex. Julien">
+        <input id="riderName" type="text" autocomplete="name" required maxlength="40" placeholder="Ex. Jacqueline">
       </label>
       <label>Poids cycliste kg
-        <input id="riderWeight" type="number" inputmode="decimal" min="20" max="200" step="0.1" required placeholder="Ex. 72.5">
+        <input id="riderWeight" type="number" inputmode="decimal" min="20" max="200" step="0.1" required placeholder="Ex. 77">
       </label>
       <div class="dialog-actions">
         <button type="button" class="danger-button" id="deleteRiderButton">Supprimer</button>
@@ -340,10 +348,10 @@
         <input id="bikeName" type="text" required maxlength="40" placeholder="Ex. Gravel titane">
       </label>
       <label>Poids vélo + équipement kg
-        <input id="bikeWeight" type="number" inputmode="decimal" min="3" max="60" step="0.1" required placeholder="Ex. 10.8">
+        <input id="bikeWeight" type="number" inputmode="decimal" min="3" max="60" step="0.1" required placeholder="Ex. 9">
       </label>
       <label>Largeur pneu mesurée mm
-        <input id="bikeTireWidth" type="number" inputmode="numeric" min="20" max="65" step="1" required placeholder="Ex. 32">
+        <input id="bikeTireWidth" type="number" inputmode="numeric" min="20" max="65" step="1" required placeholder="Ex. 45">
       </label>
       <label>Diamètre de roue
         <select id="bikeWheelDiameter" required></select>

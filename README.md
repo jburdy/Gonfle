@@ -2,6 +2,8 @@
 
 Un calculateur de pression de pneus vélo moderne, esthétique, 100% local, qui intègre nativement les chambres à air TPU.
 
+### 🌐 **[Accéder à l'application en ligne (GitHub Pages)](https://jburdy.github.io/Gonfle/)**
+
 ## Pourquoi Gonflé ?
 
 Les calculateurs existants (SRAM AXS, SILCA, Pirelli, etc.) souffrent de plusieurs limites :

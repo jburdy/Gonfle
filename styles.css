@@ -647,17 +647,22 @@ details {
 
 summary {
   min-height: var(--tap);
-  padding: 16px 18px;
+  padding: 16px clamp(12px, 2.5vw, 18px);
   color: var(--text);
   font-weight: 900;
   cursor: pointer;
 }
 
-details p,
-details pre,
-details .table-wrap {
-  margin-right: 18px;
-  margin-left: 18px;
+.details-body {
+  padding: 0 clamp(12px, 2.5vw, 18px) clamp(12px, 2.5vw, 18px);
+}
+
+.details-body > *:first-child {
+  margin-top: 0;
+}
+
+.details-body > *:last-child {
+  margin-bottom: 0;
 }
 
 details p {
@@ -668,7 +673,7 @@ details p {
 .source-list {
   display: grid;
   gap: 10px;
-  margin: 0 18px 18px;
+  margin: 0 0 18px;
   padding-left: 20px;
   color: var(--muted-strong);
   line-height: 1.5;
@@ -821,21 +826,24 @@ details a {
   flex-direction: column;
   gap: 14px;
   margin: 16px 0 24px;
-  padding: 16px 20px;
+  padding: 16px clamp(12px, 2.5vw, 20px);
   border-radius: var(--radius-md);
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid var(--line);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .math-expr {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   font-family: inherit;
   font-size: 1.05rem;
   gap: 6px;
   color: #effff6;
   line-height: 1.4;
+  white-space: nowrap;
 }
 
 .math-expr var {
