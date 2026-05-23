@@ -75,7 +75,7 @@ select {
   background-image:
     linear-gradient(45deg, transparent 50%, var(--muted-strong) 50%),
     linear-gradient(135deg, var(--muted-strong) 50%, transparent 50%);
-  background-position: calc(100% - 18px) 20px, calc(100% - 12px) 20px;
+  background-position: calc(100% - 18px) center, calc(100% - 12px) center;
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
   padding-right: 36px;
@@ -97,7 +97,7 @@ label {
 }
 
 .field-help {
-  margin: -4px 0 0;
+  margin: 10px 0 0;
   color: var(--muted);
   font-size: 0.86rem;
   line-height: 1.5;
@@ -397,6 +397,11 @@ button.guide-link {
   border-color: rgba(255, 92, 112, 0.38);
   color: #ffd5dc;
   background: rgba(255, 92, 112, 0.1);
+}
+
+.danger-button:hover {
+  border-color: rgba(255, 92, 112, 0.65);
+  background: rgba(255, 92, 112, 0.2);
 }
 
 .choice-grid {
@@ -724,11 +729,14 @@ details a {
 }
 
 .dialog-actions {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  display: flex;
   gap: 10px;
   align-items: center;
   margin-top: 6px;
+}
+
+.dialog-actions .ghost-button {
+  margin-left: auto;
 }
 
 .is-hidden {
@@ -789,11 +797,12 @@ details a {
   }
 
   .dialog-actions {
+    display: grid;
     grid-template-columns: 1fr;
   }
 
-  .dialog-actions span {
-    display: none;
+  .dialog-actions .ghost-button {
+    margin-left: 0;
   }
 }
 
@@ -804,4 +813,116 @@ details a {
     scroll-behavior: auto !important;
     transition: none !important;
   }
+}
+
+/* Typographie et mise en page des expressions mathématiques */
+.math-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 16px 0 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--line);
+}
+
+.math-expr {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-family: inherit;
+  font-size: 1.05rem;
+  gap: 6px;
+  color: #effff6;
+  line-height: 1.4;
+}
+
+.math-expr var {
+  font-style: italic;
+  font-weight: 750;
+  color: var(--accent);
+}
+
+.math-expr var sub {
+  font-style: normal;
+  font-size: 0.72em;
+  font-weight: 500;
+}
+
+.math-fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  padding: 0 4px;
+}
+
+.math-numerator {
+  border-bottom: 1px solid rgba(159, 184, 214, 0.4);
+  padding-bottom: 2px;
+  text-align: center;
+  width: 100%;
+}
+
+.math-denominator {
+  padding-top: 2px;
+  text-align: center;
+  width: 100%;
+}
+
+.inline-frac {
+  font-size: 0.88em;
+}
+
+.math-bracket {
+  font-size: 1.6rem;
+  font-weight: 200;
+  color: var(--muted);
+}
+
+.math-sqrt {
+  font-size: 1.3rem;
+  font-weight: 200;
+  color: var(--muted);
+  margin-right: -2px;
+}
+
+.math-sqrt-content {
+  border-top: 1px solid rgba(159, 184, 214, 0.4);
+  padding-top: 2px;
+  display: inline-block;
+}
+
+.cpp-explanation {
+  margin: 16px 0 20px;
+  color: var(--muted-strong);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.cpp-explanation ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 12px 0;
+}
+
+.cpp-explanation li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 8px;
+}
+
+.cpp-explanation li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  top: -1px;
+  color: var(--accent);
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+.cpp-explanation strong {
+  color: var(--text);
 }

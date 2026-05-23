@@ -1,6 +1,6 @@
 <img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
 
-# Fait un rapport complet sur l'impacte des chambres à air TPU sur la pression de pneus idéale, les risques associés. Ajoute aussi des comparaisons avec le tubless ou le butyl.
+# Fait un rapport complet sur l'impact des chambres à air TPU sur la pression de pneus idéale, les risques associés. Ajoute aussi des comparaisons avec le tubeless ou le butyl.
 
 Les chambres à air en TPU ne changent pas fondamentalement la « pression idéale » (qui dépend surtout de ton poids, de la section de pneu et du terrain), mais elles permettent en pratique de rouler légèrement plus bas qu’avec du butyl, avec un bon niveau de sécurité et de rendement. En revanche, elles introduisent des risques spécifiques (montage plus délicat, sensibilité à la chaleur sur jantes à freins à patins, déformation si mal gonflées) qu’il faut connaître, et leur comportement reste différent d’un montage tubeless.[^1][^2][^3][^4][^5][^6]
 

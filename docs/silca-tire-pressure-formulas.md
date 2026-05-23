@@ -160,7 +160,7 @@ L'interface met les bar en valeur principale avec une decimale. Les PSI sont aff
 ## Alerte Hookless
 
 ```text
-si PSI_avant_affiche > 70 ou PSI_arriere_affiche > 70:
+si max(PSI_avant, PSI_arriere, PSI_avant_cible, PSI_arriere_cible) > 70:
     afficher l'avertissement hookless/tubeless straight side rims
 ```
 

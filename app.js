@@ -438,11 +438,9 @@
     const targetFrontPsi = roundTo(targetRawFrontPsi, 1);
     const targetRearPsi = roundTo(targetRawRearPsi, 1);
     const pinchFlat = calculatePinchFlat({ massKg, speedMph: ride.speedMph, width, k, rawFrontPsi: targetRawFrontPsi, rawRearPsi: targetRawRearPsi });
-    if (pinchFlat.frontAlternativePsi !== undefined) {
-      pinchFlat.targetFrontAlternativePsi = pinchFlat.frontAlternativePsi;
-      pinchFlat.targetRearAlternativePsi = pinchFlat.rearAlternativePsi;
-      pinchFlat.frontAlternativePsi = roundTo(Math.max(0, pinchFlat.frontAlternativePsi - environment.correctionPsi), 1);
-      pinchFlat.rearAlternativePsi = roundTo(Math.max(0, pinchFlat.rearAlternativePsi - environment.correctionPsi), 1);
+    if (pinchFlat.frontAlternativePsiRaw !== undefined) {
+      pinchFlat.frontAlternativePsi = roundTo(Math.max(0, pinchFlat.frontAlternativePsiRaw - environment.correctionPsi), 1);
+      pinchFlat.rearAlternativePsi = roundTo(Math.max(0, pinchFlat.rearAlternativePsiRaw - environment.correctionPsi), 1);
     }
 
     return {
@@ -520,8 +518,8 @@
       pinchFlatRisk,
       pinchFlatFactor,
       recommendedWidthMm: Math.ceil(recommendedWidth),
-      frontAlternativePsi: roundTo(alternativeRatio * rawFrontPsi, 1),
-      rearAlternativePsi: roundTo(alternativeRatio * rawRearPsi, 1),
+      frontAlternativePsiRaw: alternativeRatio * rawFrontPsi,
+      rearAlternativePsiRaw: alternativeRatio * rawRearPsi,
     };
   }
 
@@ -820,6 +818,9 @@
   }
 
   function parseNumericInput(value) {
+    if (value === null || value === undefined || String(value).trim() === "") {
+      return NaN;
+    }
     return Number(String(value).replace(",", "."));
   }
 
@@ -859,7 +860,8 @@
 
   function formatSignedBar(value) {
     const rounded = roundTo(value, 0.1);
-    return `${rounded > 0 ? "+" : ""}${formatBar(Math.abs(rounded))}`;
+    const prefix = rounded > 0 ? "+" : "";
+    return `${prefix}${formatBar(rounded)}`;
   }
 
   function showDialog(dialog) {
