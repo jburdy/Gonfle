@@ -35,6 +35,8 @@
     { id: "584", label: "650B / 27.5\"" },
     { id: "571", label: "650C" },
     { id: "559", label: "26\"" },
+    { id: "406", label: "20\" (406 mm)" },
+    { id: "451", label: "20\" (451 mm)" },
   ];
 
   const WEIGHT_DISTRIBUTIONS = [

@@ -10,7 +10,7 @@ Source analysee: `https://silca.cc/pages/pro-tire-pressure-calculator`, bloc Jav
 | --- | --- |
 | Poids total systeme | kg. Si l'utilisateur saisit des livres: `kg = lbs * 0.453592`. Valide de 34 a 205 kg. |
 | Largeur pneu mesuree | mm, options 20 a 65. |
-| Diametre roue | BSD en mm: 622 pour 700C/29", 571 pour 650C, 584 pour 650B/27.5", 559 pour 26". |
+| Diametre roue | BSD en mm: 622 pour 700C/29", 571 pour 650C, 584 pour 650B/27.5", 559 pour 26", 406 pour 20" (standard/BMX/pliant), 451 pour 20" (mini-velo/competition). |
 | Vitesse moyenne | mph, options 12.5, 15.5, 17.5, 19.5, 21.5, 24. |
 
 ## Coefficient De Surface
